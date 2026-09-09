@@ -15,7 +15,7 @@ Set dokumentasi keperluan bagi sebuah sistem dalaman yang menggabungkan **tempah
 | # | Dokumen | Kandungan | Audiens utama |
 |---|---|---|---|
 | 00 | [Project Charter & Vision](00-project-charter.md) | Latar belakang, objektif, skop, stakeholder, kekangan | Pengurusan, PMO |
-| 01 | [Senarai & Peta Modul](01-modules.md) | 16 modul, sempadan modul, matriks peranan, fasa | Semua |
+| 01 | [Senarai & Peta Modul](01-modules.md) | 17 modul, sempadan modul, matriks peranan, fasa | Semua |
 | 02 | [BRS — Business Requirements](02-BRS-business-requirements.md) | Keperluan perniagaan, KPI, kes perniagaan | Pengurusan atasan |
 | 03 | [URS — User Requirements](03-URS-user-requirements.md) | Keperluan pengguna mengikut persona, user story | Pengguna, BA |
 | 04 | [SRS — Software Requirements](04-SRS-software-requirements.md) | Keperluan fungsian terperinci (FR) setiap modul | Pembangun, QA |
