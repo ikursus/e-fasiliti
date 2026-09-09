@@ -102,10 +102,18 @@
                     </a>
                 @endif
 
+                @can('aset.lihat')
+                    <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Aset</p>
+                    <a href="{{ route('admin.assets.index') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.assets*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Inventori Aset
+                    </a>
+                @endcan
+
                 <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Modul (akan datang)</p>
                 <p class="px-3 py-2 text-sm text-slate-500">Tempahan Bilik Mesyuarat</p>
                 <p class="px-3 py-2 text-sm text-slate-500">Aduan &amp; Tiket ICT</p>
-                <p class="px-3 py-2 text-sm text-slate-500">Inventari Aset</p>
             </nav>
 
             <div class="border-t border-slate-800 px-5 py-4">

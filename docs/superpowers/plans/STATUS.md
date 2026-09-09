@@ -19,15 +19,32 @@ Pembangunan M09 bermula 9 September 2026 di atas keputusan yang direkodkan dalam
 | T4 | `app/Models/Location.php`: hubungan `assets()` + sebab `'aset'` dalam `referenceSummary()` |
 | T6 | `app/Http/Requests/Admin/AssetStoreRequest.php` (peraturan DRD, kategori/lokasi/pengguna mesti aktif, mesej BM), `AssetUpdateRequest.php` (unique ignore sendiri + `reason` wajib bila lokasi/pemilik/status berubah melalui `after()`) |
 
-### Belum dibuat (susunan sambungan)
+### Siap (T5–T10, 9 September 2026)
 
-1. **T5 kebenaran** — `RolesAndPermissionsSeeder`: tambah 4 kebenaran `aset.lihat/cipta/kemaskini/padam` dalam `PERMISSIONS` (blok M09 sebelum blok M01); peruntukan: pegawai-aset +4, kakitangan/setiausaha/pentadbir-fasiliti/juruteknik/penyelia-ict +`aset.lihat`, pelulus tiada; docblock penyimpangan juruteknik RU→R. Kemas kini `tests/Feature/Admin/PermissionSeedingTest.php` `EXPECTED_GRANTS` (masuk mengikut susunan alfabetikal dalam setiap peranan) + ujian baharu `test_only_asset_officer_and_system_administrator_may_manage_assets`.
-2. **T7 pengawal** — `app/Http/Controllers/Admin/AssetController.php` (corak `LocationController`, constructor `AuditRecorder`): `index` (eager `category,location,responsibleUser`; carian `search` + penapis `status/category_id/location_id/responsible_user_id`; `visibleTo`; `paginate(15)->withQueryString()`), `create`, `store` (transaksi: `Asset::create($request->safe()->all() + ['qr_code' => (string) Str::uuid()])` + sejarah `Didaftar`; audit `asset.created` SELEPAS transaksi dengan `refresh()->auditSnapshot()`), `show` (`ensureVisible()` → 404 bagi kakitangan bukan pemilik), `edit`, `update` (before `movementSnapshot`+`auditSnapshot` → update → `movementEvents()` → baris sejarah peristiwa dengan sebab; audit selepas transaksi), `destroy` (audit before; sejarah cascade). Helper: `categories()` (ofType KategoriAset + active), `locations()`, `users()` (is_active), `movementEvents()`, `ensureVisible()`, `actor()`.
-3. **T7 routes** — `routes/web.php`: import `AssetController` + blok `Route::prefix('assets')->name('assets.')` DALAM kumpulan `admin` sedia ada, selepas `organization-units.destroy`, sebelum komen "Configuration (M01)". 7 route eksplisit dengan `can:aset.*`: index(lihat), create+store(cipta), show(lihat), edit+update(kemaskini), destroy(padam). **Import dan guna dalam SATU suntingan** (peraturan .ai/rules/routes.md).
-4. **T8 paparan** — `resources/views/admin/assets/{_form,create,edit,index,show}.blade.php` (corak users/index: jadual + `links()`, badge `{{ $asset->status->badge() }}` + label; borang guna `<x-ui.location-picker name="location_id" ...>`); sidebar `layouts/app.blade.php`: ganti placeholder `Inventari Aset` dalam blok "Modul (akan datang)" dengan seksyen `@can('aset.lihat')` → pautan `admin.assets.index` (DirectoryNavigationTest disemak — tiada rujukan placeholder, selamat).
-5. **T9 ujian** — `tests/Unit/Enums/AssetStatusTest.php`, `tests/Unit/Models/AssetTest.php` (casts, hubungan, warrantyStatus aktif/tamat/tiada, scopeSearch, scopeVisibleTo), `tests/Unit/Models/AssetSchemaTest.php` (registration_number unik → QueryException; serial nullable berbilang; FK restrict kategori; cascade sejarah bila aset dipadam), `tests/Feature/Admin/AssetManagementTest.php` (matriks 8 peranan × baca/tulis, TC-AST-01/02/03, kategori salah jenis/tidak aktif ditolak, lokasi tidak aktif ditolak, skop kakitangan index+show, carian+penapis, padam + audit), `tests/Feature/Admin/AssetHistoryTest.php` (didaftar/pindah_lokasi/tukar_pemilik/tukar_status, sebab wajib, suntingan catatan sahaja tiada sejarah baharu).
-6. **T10 checkpoint** — `php artisan migrate` (WAJIB selepas jadual baharu; `migrate:fresh` dilarang), `vendor/bin/pint --dirty`, `php artisan test --compact`, commit; **tanya pengguna** sebelum menjalankan semula `RolesAndPermissionsSeeder` pada DB dev.
+- **T5** — `RolesAndPermissionsSeeder`: 4 kebenaran `aset.*` + peruntukan (pegawai-aset & pentadbir-sistem menulis; kakitangan/setiausaha/pentadbir-fasiliti/juruteknik/penyelia-ict `aset.lihat`; pelulus tiada) + docblock penyimpangan; `PermissionSeedingTest` `EXPECTED_GRANTS` + ujian matriks baharu.
+- **T7** — `app/Http/Controllers/Admin/AssetController.php` (index: carian + 4 penapis + `visibleTo` + `paginate(15)`; store: transaksi + `qr_code` Str::uuid + sejarah `didaftar` + audit selepas refresh; show: `ensureVisible` 404 skop kakitangan; update: `movementEvents()` → sejarah bersebab; destroy: audit before) + 7 route `admin/assets.*` dengan `can:aset.*` (import+guna satu suntingan).
+- **T8** — 5 paparan `resources/views/admin/assets/` (index jadual+pagination+penapis, `_form` kongsi dengan `location-picker`, create, edit, show dengan waranti + jadual sejarah) + sidebar seksyen "Aset" (placeholder "Inventari Aset" dibuang).
+- **T9** — ujian baharu: `AssetStatusTest`, `AssetTest`, `AssetSchemaTest`, `AssetManagementTest`, `AssetHistoryTest`, kemas kini `PermissionSeedingTest`.
+- **T10** — `php artisan migrate` berjalan (jadual `assets` + `asset_histories` kini wujud dalam DB dev `efasiliti2`); pint lulus; phpunit hijau penuh.
 
+### Keputusan ujian penuh (9 September 2026)
+
+| Set | Keputusan |
+|---|---|
+| tests/Unit | 75 / 75 OK |
+| tests/Feature/Admin | 157 / 157 OK |
+| tests/Feature root | 19 / 19 OK + AuthenticationTest 7 / 7 OK |
+| **Jumlah** | **258 / 258 OK** |
+
+### Isu persekitaran ditemui (bukan regresi M09)
+
+- `.env` menetapkan `APP_LOCALE=en` → mesej throttle log masuk keluar dalam bahasa Inggeris → `AuthenticationTest::test_account_is_locked_after_five_failed_attempts` gagal. Dibuktikan: dengan `APP_LOCALE=ms` ujian lulus 7/7. Cadangan (BR-07/NFR-U08): tetapkan `APP_LOCALE=ms` — menunggu keputusan pengguna.
+- Laragon PHP tidak memuatkan php.ini dari shell ini; guna `storage/run_tests.cmd <laluan-ujian>` atau `-d extension_dir=... -d extension=...` (lihat nota bawah).
+
+### Baki (menunggu / fasa susulan M09)
+
+1. **Jalankan `php artisan db:seed --class=RolesAndPermissionsSeeder` pada DB dev — MENUNGGU KEBENARAN PENGGUNA.** Tanpa itu, kebenaran `aset.*` belum wujud dalam DB dan menu/halaman aset akan 403 dalam pelayar.
+2. FR-AST-03 penjanaan no. pendaftaran automatik; FR-AST-08/09 label QR; FR-AST-12/13 import/eksport; FR-AST-14 pelupusan berperingkat; FR-AST-11 penuh selepas M10/M11; vendor M12.
 ### Nota persekitaran
 
 - `php` tiada pada PATH → `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.

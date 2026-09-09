@@ -41,6 +41,12 @@ class RolesAndPermissionsSeeder extends Seeder
         'unit-organisasi.kemaskini',
         'unit-organisasi.padam',
 
+        // M09 — Inventari & Pendaftaran Aset ICT
+        'aset.lihat',
+        'aset.cipta',
+        'aset.kemaskini',
+        'aset.padam',
+
         // M01 — Pentadbiran & Konfigurasi
         'tetapan.lihat',
         'tetapan.kemaskini',
@@ -80,16 +86,24 @@ class RolesAndPermissionsSeeder extends Seeder
      * not omitted: the directory is still gated by role rather than by
      * permission (routes/web.php), so granting pengguna.lihat today would
      * change nothing. Add it when those routes move to can: gating.
+     * Note (9 September 2026): the M09 asset register is writable only by
+     * Pegawai Aset and Pentadbir Sistem. The matrix originally gave Juruteknik
+     * RU on M09; the process owner reduced that to read-only, and the matrix
+     * note in docs-claude/01-modules.md §3 records the decision. Kakitangan
+     * holds aset.lihat for the "R sendiri" scope, enforced by the controller.
+     *
      *
      * @var array<string, array<int, string>>
      */
     public const ROLE_PERMISSIONS = [
         'kakitangan' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
@@ -100,6 +114,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'aset.lihat',
             'laporan.lihat',
             'tetapan.lihat',
             'lokasi.lihat',
@@ -108,11 +123,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'penyelia-ict' => [
+            'aset.lihat',
             'laporan.lihat',
             'audit.lihat',
             'tetapan.lihat',
@@ -120,6 +137,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pegawai-aset' => [
+            'aset.lihat',
+            'aset.cipta',
+            'aset.kemaskini',
+            'aset.padam',
             'laporan.lihat',
             'audit.lihat',
             'tetapan.lihat',

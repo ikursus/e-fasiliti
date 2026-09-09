@@ -24,11 +24,13 @@ class PermissionSeedingTest extends TestCase
      */
     private const EXPECTED_GRANTS = [
         'kakitangan' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
@@ -39,6 +41,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
@@ -47,11 +50,13 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
+            'aset.lihat',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'penyelia-ict' => [
+            'aset.lihat',
             'audit.lihat',
             'laporan.lihat',
             'lokasi.lihat',
@@ -59,6 +64,10 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pegawai-aset' => [
+            'aset.cipta',
+            'aset.kemaskini',
+            'aset.lihat',
+            'aset.padam',
             'audit.lihat',
             'laporan.lihat',
             'lokasi.cipta',
@@ -68,6 +77,10 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pentadbir-sistem' => [
+            'aset.cipta',
+            'aset.kemaskini',
+            'aset.lihat',
+            'aset.padam',
             'audit.lihat',
             'laporan.lihat',
             'lokasi.cipta',
@@ -226,6 +239,29 @@ class PermissionSeedingTest extends TestCase
                 in_array($slug, ['penyelia-ict', 'pegawai-aset', 'pentadbir-sistem'], true),
                 $role->hasPermissionTo('audit.lihat'),
                 "Kebenaran audit.lihat salah bagi peranan {$slug}."
+            );
+        }
+    }
+
+    public function test_only_asset_officer_and_system_administrator_may_manage_assets(): void
+    {
+        $allowed = ['pentadbir-sistem', 'pegawai-aset'];
+
+        foreach (array_keys(RolesAndPermissionsSeeder::ROLES) as $slug) {
+            $role = Role::findByName($slug);
+
+            foreach (['cipta', 'kemaskini', 'padam'] as $verb) {
+                $this->assertSame(
+                    in_array($slug, $allowed, true),
+                    $role->hasPermissionTo("aset.{$verb}"),
+                    "Kebenaran aset.{$verb} salah bagi peranan {$slug}."
+                );
+            }
+
+            $this->assertSame(
+                $slug !== 'pelulus',
+                $role->hasPermissionTo('aset.lihat'),
+                "Kebenaran aset.lihat salah bagi peranan {$slug}."
             );
         }
     }

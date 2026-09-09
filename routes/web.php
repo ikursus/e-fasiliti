@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AssetController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\OrganizationUnitController;
 use App\Http\Controllers\Admin\RoleController;
@@ -129,6 +130,40 @@ Route::middleware('auth')->group(function (): void {
             Route::delete('organization-units/{organization_unit}', [OrganizationUnitController::class, 'destroy'])
                 ->middleware('can:unit-organisasi.padam')
                 ->name('organization-units.destroy');
+            /**
+             * Aset (M09). Penulisan terhad kepada pegawai-aset dan
+             * pentadbir-sistem; peranan lain membaca sahaja (keputusan
+             * 9 September 2026).
+             */
+            Route::prefix('assets')->name('assets.')->group(function (): void {
+                Route::get('/', [AssetController::class, 'index'])
+                    ->middleware('can:aset.lihat')
+                    ->name('index');
+
+                Route::get('create', [AssetController::class, 'create'])
+                    ->middleware('can:aset.cipta')
+                    ->name('create');
+
+                Route::post('/', [AssetController::class, 'store'])
+                    ->middleware('can:aset.cipta')
+                    ->name('store');
+
+                Route::get('{asset}', [AssetController::class, 'show'])
+                    ->middleware('can:aset.lihat')
+                    ->name('show');
+
+                Route::get('{asset}/edit', [AssetController::class, 'edit'])
+                    ->middleware('can:aset.kemaskini')
+                    ->name('edit');
+
+                Route::put('{asset}', [AssetController::class, 'update'])
+                    ->middleware('can:aset.kemaskini')
+                    ->name('update');
+
+                Route::delete('{asset}', [AssetController::class, 'destroy'])
+                    ->middleware('can:aset.padam')
+                    ->name('destroy');
+            });
 
             /**
              * Configuration (M01). Four roles may read; only the system
