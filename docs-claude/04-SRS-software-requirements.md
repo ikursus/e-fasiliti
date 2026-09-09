@@ -388,3 +388,9 @@ Perkara berikut memerlukan keputusan pemilik proses sebelum pembangunan modul be
 | ISU-03 | Adakah kos pembaikan perlu diselaraskan dengan sistem kewangan, atau simpanan dalaman memadai? | M10, M15 | Fasa 2, minggu 2 |
 | ISU-04 | Format nombor pendaftaran aset yang hendak digunakan bagi aset sedia ada dan aset baharu | M09 | Fasa 2, minggu 1 |
 | ISU-05 | Siapakah pemilik proses bagi permintaan minuman dan susun atur bilik? | M08 | Fasa 3, minggu 1 |
+
+**Keputusan pemilik proses (9 September 2026):**
+
+| ID | Keputusan |
+|---|---|
+| ISU-04 | Fasa 1 modul M09 menerima nombor pendaftaran secara **manual** (medan wajib, unik merentas semua status termasuk dilupuskan — DI-04). Penjanaan automatik FR-AST-03 dilaksanakan selepas CRUD teras selesai, apabila corak nombor dikonfigurasi. Token `kod_qr` disimpan sejak pendaftaran supaya FR-AST-08/09 tidak memerlukan migrasi tambahan. Pemetaan skema penuh: 05-DRD §4.3. |

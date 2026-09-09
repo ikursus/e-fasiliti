@@ -320,7 +320,7 @@ graph LR
 3. Sistem memaparkan medan spesifikasi yang berkaitan dengan kategori tersebut.
 4. Pegawai mengisi jenama, model, nombor siri, tarikh perolehan dan maklumat waranti.
 5. Pegawai menetapkan lokasi dan pengguna bertanggungjawab.
-6. Sistem menjana nombor pendaftaran mengikut corak yang dikonfigurasi.
+6. Sistem menjana nombor pendaftaran mengikut corak yang dikonfigurasi. *(Keputusan ISU-04, 9 September 2026: fasa 1 menerima nombor secara manual; penjanaan automatik menyusul selepas CRUD teras — lihat 04-SRS §5.)*
 7. Sistem menyimpan aset dan merekod peristiwa pendaftaran dalam sejarah aset.
 8. Pegawai menjana dan mencetak label kod QR.
 
