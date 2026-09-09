@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\OrganizationUnitController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\Settings\ChatbotSettingsController;
 use App\Http\Controllers\Admin\Settings\GeneralSettingsController;
 use App\Http\Controllers\Admin\Settings\HolidayController;
 use App\Http\Controllers\Admin\Settings\NotificationTemplateController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +68,28 @@ Route::middleware('auth')->group(function (): void {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('password.confirm.store');
+
+    /**
+     * M17 — Pembantu AI (chatbot), open to every role holding chatbot.guna
+     * (FR-CHB-01). Sending a message is throttled per user (FR-CHB-06).
+     */
+    Route::prefix('chatbot')
+        ->name('chatbot.')
+        ->middleware('can:chatbot.guna')
+        ->group(function (): void {
+            Route::get('/', [ChatbotController::class, 'index'])
+                ->name('index');
+
+            Route::post('sessions', [ChatbotController::class, 'storeSession'])
+                ->name('sessions.store');
+
+            Route::delete('sessions/{chat_session}', [ChatbotController::class, 'destroySession'])
+                ->name('sessions.destroy');
+
+            Route::post('sessions/{chat_session}/messages', [ChatbotController::class, 'send'])
+                ->middleware('throttle:20,1')
+                ->name('messages.store');
+        });
 
     /**
      * Directory administration (M03). Shared by three roles, so access is
@@ -194,6 +218,18 @@ Route::middleware('auth')->group(function (): void {
                 Route::put('notification-templates/{notification_template}', [NotificationTemplateController::class, 'update'])
                     ->middleware('can:tetapan.kemaskini')
                     ->name('notification-templates.update');
+
+                /**
+                 * M17 — assistant configuration (FR-CHB-05). Only roles
+                 * holding chatbot.tetapan may change these.
+                 */
+                Route::get('chatbot', [ChatbotSettingsController::class, 'edit'])
+                    ->middleware('can:chatbot.tetapan')
+                    ->name('chatbot');
+
+                Route::put('chatbot', [ChatbotSettingsController::class, 'update'])
+                    ->middleware('can:chatbot.tetapan')
+                    ->name('chatbot.update');
             });
         });
 

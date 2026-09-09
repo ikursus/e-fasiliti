@@ -23,4 +23,15 @@
             </a>
         @endif
     @endforeach
+
+    {{-- M17 — stricter permission than the other tabs, so it sits outside --}}
+    {{-- the shared $tabs list and renders only for its own audience. --}}
+    @can('chatbot.tetapan')
+        @if (Route::has('admin.settings.chatbot'))
+            <a href="{{ route('admin.settings.chatbot') }}"
+               class="-mb-px border-b-2 px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.settings.chatbot*') ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }}">
+                Chatbot
+            </a>
+        @endif
+    @endcan
 </nav>

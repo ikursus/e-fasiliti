@@ -54,6 +54,14 @@
                     Papan Pemuka
                 </a>
 
+                @can('chatbot.guna')
+                    <a href="{{ route('chatbot.index') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('chatbot*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Pembantu AI
+                    </a>
+                @endcan
+
                 @canany(['lokasi.lihat', 'unit-organisasi.lihat'])
                     <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Direktori</p>
                 @endcanany
