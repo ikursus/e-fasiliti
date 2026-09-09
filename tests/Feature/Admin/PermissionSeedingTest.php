@@ -24,6 +24,7 @@ class PermissionSeedingTest extends TestCase
      */
     private const EXPECTED_GRANTS = [
         'kakitangan' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -32,6 +33,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -40,6 +42,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -48,6 +51,10 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'bilik.cipta',
+            'bilik.kemaskini',
+            'bilik.lihat',
+            'bilik.padam',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
@@ -95,6 +102,10 @@ class PermissionSeedingTest extends TestCase
         ],
         'pentadbir-sistem' => [
             'audit.lihat',
+            'bilik.cipta',
+            'bilik.kemaskini',
+            'bilik.lihat',
+            'bilik.padam',
             'chatbot.guna',
             'chatbot.tetapan',
             'laporan.lihat',
@@ -171,6 +182,30 @@ class PermissionSeedingTest extends TestCase
                 Role::findByName($slug)->hasPermissionTo('lokasi.lihat'),
                 "Peranan {$slug} sepatutnya boleh melihat lokasi."
             );
+        }
+    }
+
+    public function test_room_catalog_permissions_follow_the_matrix(): void
+    {
+        $mayRead = ['kakitangan', 'setiausaha', 'pelulus', 'pentadbir-fasiliti', 'pentadbir-sistem'];
+        $mayWrite = ['pentadbir-fasiliti', 'pentadbir-sistem'];
+
+        foreach (array_keys(RolesAndPermissionsSeeder::ROLES) as $slug) {
+            $role = Role::findByName($slug);
+
+            $this->assertSame(
+                in_array($slug, $mayRead, true),
+                $role->hasPermissionTo('bilik.lihat'),
+                "Kebenaran bilik.lihat salah bagi peranan {$slug}."
+            );
+
+            foreach (['cipta', 'kemaskini', 'padam'] as $verb) {
+                $this->assertSame(
+                    in_array($slug, $mayWrite, true),
+                    $role->hasPermissionTo("bilik.{$verb}"),
+                    "Kebenaran bilik.{$verb} salah bagi peranan {$slug}."
+                );
+            }
         }
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Location;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -79,6 +80,14 @@ class LocationTest extends TestCase
         User::factory()->create(['primary_location_id' => $location->id]);
 
         $this->assertContains('pengguna', $location->referenceSummary());
+    }
+
+    public function test_reference_summary_reports_rooms(): void
+    {
+        $location = Location::factory()->ruang()->create();
+        Room::factory()->create(['location_id' => $location->id]);
+
+        $this->assertContains('bilik', $location->referenceSummary());
     }
 
     public function test_reference_summary_reports_children_and_users_together(): void

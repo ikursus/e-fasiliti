@@ -10,10 +10,11 @@ class RolesAndPermissionsSeeder extends Seeder
 {
     /**
      * Core permissions for the base platform modules: M01 configuration,
-     * M02 users and roles, M03 organisation and location directory,
-     * M15 reporting and M16 audit. Permissions for the remaining domain
-     * modules (M04–M14) are added when those modules are developed,
-     * according to the module/role matrix in docs-claude/01-modules.md §3.
+     * M02 users and roles, M03 organisation and location directory, M04
+     * room catalogue, M15 reporting and M16 audit. Permissions for the
+     * remaining domain modules (M05–M14) are added when those modules are
+     * developed, according to the module/role matrix in
+     * docs-claude/01-modules.md §3.
      *
      * @var array<int, string>
      */
@@ -40,6 +41,12 @@ class RolesAndPermissionsSeeder extends Seeder
         'unit-organisasi.cipta',
         'unit-organisasi.kemaskini',
         'unit-organisasi.padam',
+
+        // M04 — Katalog Bilik & Sumber
+        'bilik.lihat',
+        'bilik.cipta',
+        'bilik.kemaskini',
+        'bilik.padam',
 
         // M01 — Pentadbiran & Konfigurasi
         'tetapan.lihat',
@@ -105,6 +112,7 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public const ROLE_PERMISSIONS = [
         'kakitangan' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -113,6 +121,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -121,6 +130,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
@@ -129,6 +139,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'bilik.cipta',
+            'bilik.kemaskini',
+            'bilik.lihat',
+            'bilik.padam',
             'chatbot.guna',
             'laporan.lihat',
             'tetapan.lihat',
