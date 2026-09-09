@@ -1,0 +1,8 @@
+# Project Intelligence
+
+- **Shell:** Working directory commands run under PowerShell 7 — `dir`/`ls` are aliases; use `Get-ChildItem` or `php artisan` for listing.
+- **PowerShell quoting:** `$var` expands in double quotes — pass PHP/CLI code in single-quoted strings or temp files to avoid parse errors.
+- **This is the new-generation "Laravel" PHP framework v13** — NOT Laravel 12 and earlier. Schema uses `Schema::create('name', function (Blueprint $table) {...})` closures; migrations are anonymous classes (`return new class extends Migration`).
+- **MySQL root account has no password** in this Laragon environment; DB name is `e-fasiliti`.
+- **Default generated migrations already include a `sessions` table** (inside `create_users_table` migration) — database session driver is expected; just run `php artisan migrate`.
+- **User language:** Malay/Indonesian — respond in that language when interacting.
