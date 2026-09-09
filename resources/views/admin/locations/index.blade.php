@@ -80,7 +80,10 @@
                         <span class="w-full truncate text-xs text-slate-500 sm:w-auto">{{ $match->fullPath() }}</span>
                         @can('lokasi.kemaskini')
                             <a href="{{ route('admin.locations.edit', $match) }}"
-                               class="ml-auto rounded-md px-2 py-1 text-xs font-semibold text-slate-600 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm">
+                               class="ml-auto inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-200 transition hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
+                                </svg>
                                 Edit
                             </a>
                         @endcan
