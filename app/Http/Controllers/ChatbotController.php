@@ -93,7 +93,11 @@ class ChatbotController extends Controller
         $text = (string) $request->validated('message');
         $isFirstMessage = ! $chat_session->messages()->exists();
 
-        $history = $chat_session->messages()
+        // Query the model directly: the messages() relation defaults to
+        // oldest-first, and chaining latest() onto it would only add a
+        // secondary ORDER BY, leaving the oldest message first.
+        $history = ChatMessage::query()
+            ->where('chat_session_id', $chat_session->id)
             ->latest()
             ->limit(max(1, (int) $this->settings->get('chatbot.max_history', 20)))
             ->get()
