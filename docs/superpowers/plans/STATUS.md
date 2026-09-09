@@ -1,5 +1,41 @@
 # Status Pelaksanaan — kemas kini 9 September 2026
 
+## SEMASA — M09 Inventori Aset ICT (branch `inventori-aset`)
+
+Pembangunan M09 bermula 9 September 2026 di atas keputusan yang direkodkan dalam `docs-claude` (commit `cff9511` pada branch ini):
+
+- CRUD aset terhad kepada **pegawai-aset** dan **pentadbir-sistem**; juruteknik **R sahaja** (penyimpangan matriks, lihat nota di 01-modules.md §3); kakitangan **R sendiri** (skop `responsible_user_id`); pelulus tiada akses.
+- No. pendaftaran **manual** pada fasa 1 (keputusan ISU-04); `qr_code` ialah token yang dijana sistem semasa daftar; vendor pembekal ditangguhkan ke M12.
+- Kategori aset melalui `reference_values` type `kategori_aset`; pemetaan skema penuh di 05-DRD §4.3.
+
+### Selesai (dicommit bersama nota ini)
+
+| Tugasan | Fail |
+|---|---|
+| T1 | `app/Enums/AssetStatus.php` (5 status + label BM + badge), `app/Enums/AssetEventType.php` |
+| T2 | `database/migrations/2026_09_09_120000_create_assets_table.php`, `2026_09_09_120100_create_asset_histories_table.php` |
+| T3 | `app/Models/Asset.php` (casts, 4 hubungan, `scopeSearch`, `scopeVisibleTo`, `movementSnapshot()`, `auditSnapshot()`, `warrantyStatus()`), `app/Models/AssetHistory.php` |
+| T3 | `database/factories/AssetFactory.php` (state: simpanan/dalamPembaikan/tidakAktif/dilupuskan/inWarranty/outOfWarranty/ownedBy/atLocation/withCategory), `AssetHistoryFactory.php` |
+| T4 | `app/Models/Location.php`: hubungan `assets()` + sebab `'aset'` dalam `referenceSummary()` |
+| T6 | `app/Http/Requests/Admin/AssetStoreRequest.php` (peraturan DRD, kategori/lokasi/pengguna mesti aktif, mesej BM), `AssetUpdateRequest.php` (unique ignore sendiri + `reason` wajib bila lokasi/pemilik/status berubah melalui `after()`) |
+
+### Belum dibuat (susunan sambungan)
+
+1. **T5 kebenaran** — `RolesAndPermissionsSeeder`: tambah 4 kebenaran `aset.lihat/cipta/kemaskini/padam` dalam `PERMISSIONS` (blok M09 sebelum blok M01); peruntukan: pegawai-aset +4, kakitangan/setiausaha/pentadbir-fasiliti/juruteknik/penyelia-ict +`aset.lihat`, pelulus tiada; docblock penyimpangan juruteknik RU→R. Kemas kini `tests/Feature/Admin/PermissionSeedingTest.php` `EXPECTED_GRANTS` (masuk mengikut susunan alfabetikal dalam setiap peranan) + ujian baharu `test_only_asset_officer_and_system_administrator_may_manage_assets`.
+2. **T7 pengawal** — `app/Http/Controllers/Admin/AssetController.php` (corak `LocationController`, constructor `AuditRecorder`): `index` (eager `category,location,responsibleUser`; carian `search` + penapis `status/category_id/location_id/responsible_user_id`; `visibleTo`; `paginate(15)->withQueryString()`), `create`, `store` (transaksi: `Asset::create($request->safe()->all() + ['qr_code' => (string) Str::uuid()])` + sejarah `Didaftar`; audit `asset.created` SELEPAS transaksi dengan `refresh()->auditSnapshot()`), `show` (`ensureVisible()` → 404 bagi kakitangan bukan pemilik), `edit`, `update` (before `movementSnapshot`+`auditSnapshot` → update → `movementEvents()` → baris sejarah peristiwa dengan sebab; audit selepas transaksi), `destroy` (audit before; sejarah cascade). Helper: `categories()` (ofType KategoriAset + active), `locations()`, `users()` (is_active), `movementEvents()`, `ensureVisible()`, `actor()`.
+3. **T7 routes** — `routes/web.php`: import `AssetController` + blok `Route::prefix('assets')->name('assets.')` DALAM kumpulan `admin` sedia ada, selepas `organization-units.destroy`, sebelum komen "Configuration (M01)". 7 route eksplisit dengan `can:aset.*`: index(lihat), create+store(cipta), show(lihat), edit+update(kemaskini), destroy(padam). **Import dan guna dalam SATU suntingan** (peraturan .ai/rules/routes.md).
+4. **T8 paparan** — `resources/views/admin/assets/{_form,create,edit,index,show}.blade.php` (corak users/index: jadual + `links()`, badge `{{ $asset->status->badge() }}` + label; borang guna `<x-ui.location-picker name="location_id" ...>`); sidebar `layouts/app.blade.php`: ganti placeholder `Inventari Aset` dalam blok "Modul (akan datang)" dengan seksyen `@can('aset.lihat')` → pautan `admin.assets.index` (DirectoryNavigationTest disemak — tiada rujukan placeholder, selamat).
+5. **T9 ujian** — `tests/Unit/Enums/AssetStatusTest.php`, `tests/Unit/Models/AssetTest.php` (casts, hubungan, warrantyStatus aktif/tamat/tiada, scopeSearch, scopeVisibleTo), `tests/Unit/Models/AssetSchemaTest.php` (registration_number unik → QueryException; serial nullable berbilang; FK restrict kategori; cascade sejarah bila aset dipadam), `tests/Feature/Admin/AssetManagementTest.php` (matriks 8 peranan × baca/tulis, TC-AST-01/02/03, kategori salah jenis/tidak aktif ditolak, lokasi tidak aktif ditolak, skop kakitangan index+show, carian+penapis, padam + audit), `tests/Feature/Admin/AssetHistoryTest.php` (didaftar/pindah_lokasi/tukar_pemilik/tukar_status, sebab wajib, suntingan catatan sahaja tiada sejarah baharu).
+6. **T10 checkpoint** — `php artisan migrate` (WAJIB selepas jadual baharu; `migrate:fresh` dilarang), `vendor/bin/pint --dirty`, `php artisan test --compact`, commit; **tanya pengguna** sebelum menjalankan semula `RolesAndPermissionsSeeder` pada DB dev.
+
+### Nota persekitaran
+
+- `php` tiada pada PATH → `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.
+- Laragon PHP TIDAK memuatkan php.ini dalam shell ini → jalankan artisan/pint dengan: `$php -d 'extension_dir=C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\ext' -d extension=mbstring ...`, dan awalkan `$env:Path = 'C:\laragon\bin\git\cmd;' + $env:Path` supaya `pint --dirty` jumpa git. Semua fail M09 lulus `php -l` dan pint (EXIT=0).
+- `git` tiada pada PATH → `C:\laragon\bin\git\cmd\git.exe`.
+- PowerShell: petikan tunggal PHP dalam rentetan PS mesti digandakan (`''`) atau guna here-string `@'...'@`; elak `$this`/`$reasons` dalam rentetan berpetikan dua (interpolasi).
+- Anchor suntingan: normalise kandungan kepada LF dalam memori, buat gantian, tulis semula dengan EOL asal (fail repo bercampur CRLF/LF).
+- `run_commands` terhad ~12k aksara; pecahkan fail besar kepada beberapa cebisan (WriteAllText + AppendAllText).
 ## Di mana kita berhenti
 
 Melaksanakan pelan M03 secara dipandu subejen: satu subejen pelaksana bagi setiap tugasan, diikuti semakan pematuhan spesifikasi, kemudian semakan kualiti kod.

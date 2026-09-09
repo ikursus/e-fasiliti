@@ -58,6 +58,12 @@ class Location extends Model
         return $this->hasMany(User::class, 'primary_location_id');
     }
 
+    /**      * ICT assets currently placed at this location (M09, FR-AST-05).      */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'location_id');
+    }
+
     /**
      * Only records that are still in use (FR-ORG-04).
      *
@@ -168,6 +174,10 @@ class Location extends Model
 
         if ($this->users()->exists()) {
             $reasons[] = 'pengguna';
+        }
+
+        if ($this->assets()->exists()) {
+            $reasons[] = 'aset';
         }
 
         return $reasons;
