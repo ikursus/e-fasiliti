@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    /**
+     * M17 — Google AI Studio (Gemini API). The key comes from
+     * https://aistudio.google.com/apikey and lives in the environment, not
+     * the database, because it is a secret.
+     */
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
+    ],
+
 ];
