@@ -27,7 +27,7 @@ class TicketEventMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->render($this->template->subject),
+            subject: $this->renderTemplate($this->template->subject),
         );
     }
 
@@ -35,7 +35,7 @@ class TicketEventMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'mail.ticket-event',
-            with: ['kandungan' => $this->render($this->template->body)],
+            with: ['kandungan' => $this->renderTemplate($this->template->body)],
         );
     }
 
@@ -43,8 +43,11 @@ class TicketEventMail extends Mailable implements ShouldQueue
      * Replace every {{ placeholder }} the template declares with its context
      * value; unknown placeholders degrade to an empty string rather than
      * leaking template syntax to the recipient.
+     *
+     * Deliberately NOT named render(): that name belongs to the public
+     * Mailable::render() API, and a private override is a fatal error.
      */
-    private function render(string $text): string
+    private function renderTemplate(string $text): string
     {
         return preg_replace_callback(
             '/\{\{\s*([a-z0-9_]+)\s*\}\}/i',
