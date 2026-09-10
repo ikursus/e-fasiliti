@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -66,6 +67,24 @@ Route::middleware('auth')->group(function (): void {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('password.confirm.store');
+
+    /**
+     * Profile (self-service). Every user may only view and update their own
+     * profile, so the routes do not bind a user model.
+     */
+    Route::prefix('profile')
+        ->name('profile.')
+        ->group(function (): void {
+            Route::get('/', [ProfileController::class, 'edit'])
+                ->name('edit');
+
+            Route::put('/', [ProfileController::class, 'update'])
+                ->name('update');
+
+            Route::put('photo', [ProfileController::class, 'updatePhoto'])
+                ->middleware('throttle:10,1')
+                ->name('photo.update');
+        });
 
     /**
      * Directory administration (M03). Shared by three roles, so access is

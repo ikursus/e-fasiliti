@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
@@ -24,6 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
     'delegate_end_at',
     'last_login_at',
     'last_login_ip',
+    'profile_photo_path',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -61,6 +63,19 @@ class User extends Authenticatable
             'delegate_end_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Public URL of the profile photo, or an empty string when none is set.
+     * The photo lives on the "public" disk at profile/{user_id}/{hash}.
+     */
+    public function profilePhotoUrl(): string
+    {
+        if ($this->profile_photo_path === null || $this->profile_photo_path === '') {
+            return '';
+        }
+
+        return Storage::disk('public')->url($this->profile_photo_path);
     }
 
     /**

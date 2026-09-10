@@ -130,9 +130,14 @@
                         <button type="button"
                             class="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             @click="open = !open">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
-                                {{ mb_substr(auth()->user()->name, 0, 1) }}
-                            </span>
+                            @if (auth()->user()->profilePhotoUrl() !== '')
+                                <img src="{{ auth()->user()->profilePhotoUrl() }}" alt="Gambar profil {{ auth()->user()->name }}"
+                                    class="h-8 w-8 rounded-full border border-slate-200 object-cover">
+                            @else
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                                    {{ mb_substr(auth()->user()->name, 0, 1) }}
+                                </span>
+                            @endif
                             <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 text-slate-400">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
@@ -144,6 +149,11 @@
                             <p class="px-4 py-2 text-xs text-slate-500">
                                 Masuk sebagai <span class="font-semibold text-slate-700">{{ auth()->user()->email }}</span>
                             </p>
+                            <div class="border-t border-slate-100">
+                                <a href="{{ route('profile.edit') }}"
+                                    @click="open = false"
+                                    class="block px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">Profil Saya</a>
+                            </div>
                             <div class="border-t border-slate-100">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
