@@ -155,10 +155,6 @@
                         Inventori Aset
                     </a>
                 @endcan
-
-                <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Modul (akan datang)</p>
-                <p class="px-3 py-2 text-sm text-slate-500">Enjin Tempahan &amp; Kalendar</p>
-                <p class="px-3 py-2 text-sm text-slate-500">Aduan &amp; Tiket ICT</p>
             </nav>
 
             <div class="border-t border-slate-800 px-5 py-4">
