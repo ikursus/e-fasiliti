@@ -345,3 +345,31 @@ php artisan cache:clear    # jika tugasan itu menyentuh tetapan atau apa-apa yan
 `migrate` bersifat menambah dan setiap migrasi mesti mempunyai `down()` yang berfungsi. `migrate:fresh` dan `migrate:rollback` kekal dilarang: kedua-duanya memusnahkan data sebenar.
 
 Semak dengan `php artisan migrate:status` dahulu jika ragu-ragu. Ia hanya membaca.
+
+---
+
+## M04 Katalog Bilik — SIAP pada 9 September 2026 (sesi 1 + 2)
+
+**Branch:** `feature/m04-katalog-bilik`. Komit: `836e1d4` + `3ab5a34`. **Ujian: 256 lulus, 0 gagal** (garis dasar 217; +1 kegagalan sedia ada dibaiki; +38 ujian baharu M04).
+
+**Sumber ringkasan penuh:** blok "✅ Status Pelaksanaan — SIAP" di bahagian atas `2026-09-09-m04-katalog-bilik.md`.
+
+### Apa yang dihantar
+- Migrasi `rooms`/`room_layouts`/`room_facilities`/`bookings` (dijalankan pada MySQL, aditif).
+- `BookingStatus`, model `Room`/`RoomLayout`/`RoomFacility`/`Booking`, `Location::rooms()`, 3 factory, `Location::referenceSummary()` + alasan `bilik`.
+- Kebenaran `bilik.lihat/cipta/kemaskini/padam` (kod seeder + `EXPECTED_GRANTS` + ujian matriks).
+- `RoomStoreRequest`/`RoomUpdateRequest`; `Admin\RoomController` (CRUD + toggle FR-BLK-08 + audit `room.*`).
+- 5 views `admin/rooms/*` (repeater susun atur Alpine, `<x-ui.location-picker>`, waktu operasi 7 hari, skrin pengesahan nyahaktif).
+- 7 laluan `admin.rooms.*` dengan `can:bilik.*`; sidebar kumpulan "Fasiliti"; placeholder "Tempahan Bilik Mesyuarat" ditukar kepada "Enjin Tempahan & Kalendar".
+- 38 ujian baharu: unit (7), `RoomManagementTest` (11), `RoomValidationTest` (8), `RoomDeactivationTest` (5), matriks kebenaran (1) dan lain-lain.
+
+### Keputusan dan isu yang dibawa ke hadapan
+1. **Seeder kebenaran TIDAK dijalankan** — keputusan pengguna (9 Sep). `/admin/rooms` akan 403 kepada semua peranan di pelayar sehingga `php artisan db:seed --class=RolesAndPermissionsSeeder` dijalankan. Kod/ujian/laluan lengkap.
+2. **`.env` masih `APP_LOCALE=en`** (dulu `ms`). Ujian dikunci `ms` melalui phpunit.xml. UI pelayar kini berbahasa Inggeris — pengguna perlu putuskan.
+3. **Catatan "bukan repositori git" tamat tempoh** — repo git wujud; binary di `C:\laragonNafas\bin\git\cmd\git.exe`; PHP 8.4 di `C:\laragonNafas\bin\php\php-8.4.25-Win32-vs17-x86\php.exe`; kedua-duanya tiada dalam PATH. Pint: `vendor\laravel\pint\builds\pint`.
+4. Context `AuditRecorder` digabung pada **aras atas** `metadata` — bukan `metadata['context']`.
+
+### Seterusnya
+1. Bila pengguna sedia: jalankan `db:seed --class=RolesAndPermissionsSeeder` (syncPermissions membuang ubah suai manual).
+2. M06 Kelulusan — kitaran spec dan pelan dahulu (susunan dipersetujui: M04 → M06 → M05 → M14 e-mel).
+

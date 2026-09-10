@@ -5,6 +5,7 @@
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\OrganizationUnitController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\Settings\ChatbotSettingsController;
 use App\Http\Controllers\Admin\Settings\GeneralSettingsController;
 use App\Http\Controllers\Admin\Settings\HolidayController;
@@ -229,6 +230,38 @@ Route::middleware('auth')->group(function (): void {
             Route::delete('organization-units/{organization_unit}', [OrganizationUnitController::class, 'destroy'])
                 ->middleware('can:unit-organisasi.padam')
                 ->name('organization-units.destroy');
+
+            /**
+             * Room catalogue (M04). Access follows the module matrix: three
+             * roles read, facility admin and system admin write.
+             */
+            Route::get('rooms', [RoomController::class, 'index'])
+                ->middleware('can:bilik.lihat')
+                ->name('rooms.index');
+
+            Route::get('rooms/create', [RoomController::class, 'create'])
+                ->middleware('can:bilik.cipta')
+                ->name('rooms.create');
+
+            Route::post('rooms', [RoomController::class, 'store'])
+                ->middleware('can:bilik.cipta')
+                ->name('rooms.store');
+
+            Route::get('rooms/{room}/edit', [RoomController::class, 'edit'])
+                ->middleware('can:bilik.kemaskini')
+                ->name('rooms.edit');
+
+            Route::put('rooms/{room}', [RoomController::class, 'update'])
+                ->middleware('can:bilik.kemaskini')
+                ->name('rooms.update');
+
+            Route::patch('rooms/{room}/toggle', [RoomController::class, 'toggle'])
+                ->middleware('can:bilik.kemaskini')
+                ->name('rooms.toggle');
+
+            Route::delete('rooms/{room}', [RoomController::class, 'destroy'])
+                ->middleware('can:bilik.padam')
+                ->name('rooms.destroy');
 
             /**
              * Configuration (M01). Four roles may read; only the system
