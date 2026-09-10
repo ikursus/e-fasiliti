@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\AuditLog;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\Configuration\SettingsRepository;
@@ -145,5 +146,46 @@ class SettingsRepositoryTest extends TestCase
         Cache::forever('m01.system_settings', collect(['rosak' => 'payload']));
 
         $this->assertSame(1, $this->repository()->get('a.satu'));
+    }
+
+    public function test_it_stores_a_secret_encrypted_and_reads_it_back(): void
+    {
+        $this->repository()->set('a.rahsia', 'kunci-super-rahsia', null, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $stored = (string) DB::table('system_settings')->where('key', 'a.rahsia')->value('value');
+
+        $this->assertStringNotContainsString('kunci-super-rahsia', $stored);
+        $this->assertSame('kunci-super-rahsia', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_an_empty_secret_stays_empty(): void
+    {
+        $this->repository()->set('a.rahsia', '', null, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $this->assertSame('', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_a_secret_that_cannot_be_decrypted_reads_as_empty(): void
+    {
+        SystemSetting::create([
+            'key' => 'a.rahsia',
+            'value' => '"bukan-teks-tersulit"',
+            'value_type' => SettingsRepository::SECRET_TYPE,
+            'group' => 'chatbot',
+        ]);
+
+        $this->assertSame('', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_it_keeps_a_secret_out_of_the_audit_trail(): void
+    {
+        $actor = User::factory()->create();
+
+        $this->repository()->set('a.rahsia', 'kunci-super-rahsia', $actor, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $log = AuditLog::query()->latest('id')->first();
+
+        $this->assertStringNotContainsString('kunci-super-rahsia', (string) json_encode($log->metadata));
+        $this->assertTrue($log->metadata['value_redacted']);
     }
 }

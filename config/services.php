@@ -37,8 +37,9 @@ return [
 
     /**
      * M17 — Google AI Studio (Gemini API). The key comes from
-     * https://aistudio.google.com/apikey and lives in the environment, not
-     * the database, because it is a secret.
+     * https://aistudio.google.com/apikey. This entry is the fallback only:
+     * GeminiChatService prefers the encrypted chatbot.api_key setting, which
+     * an administrator can set from Konfigurasi > Pembantu AI.
      */
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),

@@ -47,6 +47,7 @@ class SystemConfigurationSeeder extends Seeder
             ['key' => 'chatbot.temperature', 'value' => '0.4', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Aras kreativiti balasan (0 hingga 2).'],
             ['key' => 'chatbot.max_output_tokens', 'value' => '1024', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Had token bagi satu balasan Pembantu AI.'],
             ['key' => 'chatbot.max_history', 'value' => '20', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Bilangan mesej terdahulu dihantar sebagai konteks perbualan.'],
+            ['key' => 'chatbot.api_key', 'value' => '""', 'value_type' => 'rahsia', 'group' => 'chatbot', 'description' => 'Kunci API Google AI Studio, disimpan tersulit. Kosong bermakna kunci diambil daripada GEMINI_API_KEY.'],
             ['key' => 'chatbot.system_prompt', 'value' => json_encode(GeminiChatService::DEFAULT_SYSTEM_PROMPT, JSON_UNESCAPED_UNICODE), 'value_type' => 'teks', 'group' => 'chatbot', 'description' => 'Arahan sistem yang membentuk personaliti Pembantu AI.'],
         ];
 

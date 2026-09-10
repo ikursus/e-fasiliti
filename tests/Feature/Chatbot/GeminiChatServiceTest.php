@@ -8,6 +8,7 @@ use App\Services\Chatbot\ChatbotConfigurationException;
 use App\Services\Chatbot\ChatbotDisabledException;
 use App\Services\Chatbot\ChatbotReply;
 use App\Services\Chatbot\GeminiChatService;
+use App\Services\Configuration\SettingsRepository;
 use Database\Seeders\SystemConfigurationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -71,7 +72,7 @@ class GeminiChatServiceTest extends TestCase
 
     public function test_it_throws_when_the_assistant_is_disabled(): void
     {
-        app(\App\Services\Configuration\SettingsRepository::class)->set('chatbot.enabled', false);
+        app(SettingsRepository::class)->set('chatbot.enabled', false);
 
         $this->expectException(ChatbotDisabledException::class);
 
@@ -109,5 +110,39 @@ class GeminiChatServiceTest extends TestCase
         $this->expectException(ChatbotApiException::class);
 
         $this->service->send('Helo', collect());
+    }
+
+    public function test_the_saved_key_overrides_the_environment_key(): void
+    {
+        app(SettingsRepository::class)->set(
+            GeminiChatService::API_KEY_SETTING,
+            'AIzaKunciTersimpan',
+            null,
+            SettingsRepository::SECRET_TYPE,
+            'chatbot',
+        );
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'Ok.']]]]],
+            ]),
+        ]);
+
+        $this->service->send('Helo', collect());
+
+        Http::assertSent(fn ($request) => $request->hasHeader('x-goog-api-key', 'AIzaKunciTersimpan'));
+    }
+
+    public function test_it_falls_back_to_the_environment_key_when_none_is_saved(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'Ok.']]]]],
+            ]),
+        ]);
+
+        $this->service->send('Helo', collect());
+
+        Http::assertSent(fn ($request) => $request->hasHeader('x-goog-api-key', 'test-key'));
     }
 }

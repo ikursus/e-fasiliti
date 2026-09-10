@@ -5,8 +5,10 @@ namespace App\Services\Configuration;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\Audit\AuditRecorder;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * The only way the rest of the application reads or writes M01 scalar
@@ -16,6 +18,12 @@ use Illuminate\Support\Facades\Cache;
 class SettingsRepository
 {
     private const CACHE_KEY = 'm01.system_settings';
+
+    /**
+     * Value type for a setting held encrypted at rest, such as an API key.
+     * Its plaintext never reaches the cache, the audit trail or a view.
+     */
+    public const SECRET_TYPE = 'rahsia';
 
     public function __construct(private readonly AuditRecorder $audit) {}
 
@@ -60,13 +68,17 @@ class SettingsRepository
         string $group = 'umum',
     ): void {
         $existing = SystemSetting::query()->find($key);
-        $before = $existing === null ? null : $this->decode($existing->value, $existing->value_type);
+
+        // The type decides how the value is encoded, and an existing row owns
+        // its own type, so it has to be resolved before anything is written.
+        $type = $existing?->value_type ?? $valueType;
+        $before = $existing === null ? null : $this->decode($existing->value, $type);
 
         $setting = SystemSetting::query()->updateOrCreate(
             ['key' => $key],
             [
-                'value' => $this->encode($value),
-                'value_type' => $existing?->value_type ?? $valueType,
+                'value' => $this->encode($value, $type),
+                'value_type' => $type,
                 'group' => $existing?->group ?? $group,
                 'description' => $existing?->description,
                 'updated_by' => $actor?->id,
@@ -75,15 +87,30 @@ class SettingsRepository
 
         $this->flush();
 
-        if ($actor !== null) {
+        if ($actor === null) {
+            return;
+        }
+
+        if ($type === self::SECRET_TYPE) {
+            // Recording the values here would write the plaintext secret into
+            // audit_logs. Context still leaves a trail that the key changed.
             $this->audit->record(
                 $actor,
                 'setting.updated',
                 $setting,
-                before: ['key' => $key, 'value' => $before],
-                after: ['key' => $key, 'value' => $value],
+                context: ['key' => $key, 'value_redacted' => true],
             );
+
+            return;
         }
+
+        $this->audit->record(
+            $actor,
+            'setting.updated',
+            $setting,
+            before: ['key' => $key, 'value' => $before],
+            after: ['key' => $key, 'value' => $value],
+        );
     }
 
     public function flush(): void
@@ -141,12 +168,38 @@ class SettingsRepository
             'nombor' => is_numeric($decoded) ? $decoded + 0 : 0,
             'boolean' => (bool) $decoded,
             'json' => is_array($decoded) ? $decoded : [],
+            self::SECRET_TYPE => $this->decrypt($decoded),
             default => is_string($decoded) ? $decoded : $raw,
         };
     }
 
-    private function encode(mixed $value): string
+    /**
+     * Plaintext behind an encrypted value, or an empty string when it cannot
+     * be read. A rotated APP_KEY is what failure looks like here, and the
+     * caller should then treat the secret as unset rather than have every
+     * settings read blow up.
+     */
+    private function decrypt(mixed $encrypted): string
     {
+        if (! is_string($encrypted) || $encrypted === '') {
+            return '';
+        }
+
+        try {
+            return Crypt::decryptString($encrypted);
+        } catch (DecryptException) {
+            return '';
+        }
+    }
+
+    private function encode(mixed $value, string $type = 'teks'): string
+    {
+        if ($type === self::SECRET_TYPE) {
+            $secret = is_string($value) ? trim($value) : '';
+
+            return json_encode($secret === '' ? '' : Crypt::encryptString($secret)) ?: '""';
+        }
+
         return json_encode($value, JSON_UNESCAPED_UNICODE) ?: '""';
     }
 }

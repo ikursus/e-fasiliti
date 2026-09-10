@@ -1,4 +1,5 @@
 <?php
+
 // Kursus Laravel
 
 use App\Http\Controllers\Admin\LocationController;
@@ -251,6 +252,11 @@ Route::middleware('auth')->group(function (): void {
                 Route::put('chatbot', [ChatbotSettingsController::class, 'update'])
                     ->middleware('can:chatbot.tetapan')
                     ->name('chatbot.update');
+
+                // Calls the Gemini API, so it is throttled per user.
+                Route::post('chatbot/test', [ChatbotSettingsController::class, 'test'])
+                    ->middleware(['can:chatbot.tetapan', 'throttle:10,1'])
+                    ->name('chatbot.test');
             });
         });
 
