@@ -120,6 +120,33 @@ class RoomManagementTest extends TestCase
             ->assertOk();
     }
 
+    /**
+     * The layout renders its own logout form, so the token has to be asserted
+     * inside the room form itself rather than anywhere on the page.
+     */
+    private function assertFormAtActionCarriesToken(string $html, string $action): void
+    {
+        $pattern = '/<form[^>]*action="'.preg_quote($action, '/').'"[^>]*>(.*?)<\/form>/s';
+
+        $this->assertMatchesRegularExpression($pattern, $html, "No form posts to {$action}.");
+
+        preg_match($pattern, $html, $matches);
+
+        $this->assertStringContainsString('name="_token"', $matches[1],
+            "The form posting to {$action} has no CSRF token, so the browser gets a 419.");
+    }
+
+    public function test_the_room_forms_carry_a_csrf_token(): void
+    {
+        $room = Room::factory()->create();
+
+        $create = $this->actingAs($this->admin)->get(route('admin.rooms.create'))->assertOk();
+        $this->assertFormAtActionCarriesToken($create->getContent(), route('admin.rooms.store'));
+
+        $edit = $this->actingAs($this->admin)->get(route('admin.rooms.edit', $room))->assertOk();
+        $this->assertFormAtActionCarriesToken($edit->getContent(), route('admin.rooms.update', $room));
+    }
+
     public function test_a_facility_administrator_may_create_a_room_with_layouts_and_facilities(): void
     {
         $this->actingAs($this->userWithRole('pentadbir-fasiliti'))

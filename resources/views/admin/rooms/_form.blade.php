@@ -1,3 +1,5 @@
+@csrf
+
 @php
     $oldLayouts = old('layouts');
 
