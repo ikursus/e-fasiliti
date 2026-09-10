@@ -6,6 +6,7 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\Configuration\SettingsRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -115,5 +116,34 @@ class SettingsRepositoryTest extends TestCase
             'description' => 'Keterangan asal.',
         ]);
         $this->assertSame(7, $this->repository()->get('a.satu'));
+    }
+
+    public function test_it_reads_settings_back_from_a_cache_that_refuses_objects(): void
+    {
+        // Production caches to the database store, which honours
+        // cache.serializable_classes. That is false, so the store refuses to
+        // unserialize any object and hands back an __PHP_Incomplete_Class.
+        // Whatever the repository caches therefore has to be plain data.
+        config(['cache.serializable_classes' => false, 'cache.stores.array.serialize' => true]);
+        Cache::purge('array');
+
+        SystemSetting::create(['key' => 'a.satu', 'value' => '1', 'value_type' => 'nombor', 'group' => 'umum']);
+
+        $repository = $this->repository();
+        $repository->get('a.satu');
+
+        $this->assertSame(1, $repository->get('a.satu'));
+        $this->assertSame(['a.satu' => 1], $repository->all()->all());
+    }
+
+    public function test_it_recomputes_when_the_cached_payload_is_unusable(): void
+    {
+        // A cache warmed before this was fixed still holds an object the
+        // store cannot restore. Recompute rather than fail the request.
+        SystemSetting::create(['key' => 'a.satu', 'value' => '1', 'value_type' => 'nombor', 'group' => 'umum']);
+
+        Cache::forever('m01.system_settings', collect(['rosak' => 'payload']));
+
+        $this->assertSame(1, $this->repository()->get('a.satu'));
     }
 }

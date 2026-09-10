@@ -92,11 +92,36 @@ class SettingsRepository
     }
 
     /**
+     * Every row, from the cache when it holds a usable payload.
+     *
+     * Only plain arrays go into the cache. `cache.serializable_classes` is
+     * false, so the store refuses to unserialize any object and hands back
+     * an __PHP_Incomplete_Class instead; caching the Collection itself made
+     * every request after the first one fail on this method's return type.
+     * A payload that is not an array is treated as a miss, which also lets a
+     * cache warmed before this was fixed heal itself.
+     *
      * @return Collection<string, array{value: string, value_type: string, group: string, description: ?string}>
      */
     private function rows(): Collection
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => SystemSetting::query()
+        $rows = Cache::get(self::CACHE_KEY);
+
+        if (! is_array($rows)) {
+            $rows = $this->readRows();
+
+            Cache::forever(self::CACHE_KEY, $rows);
+        }
+
+        return collect($rows);
+    }
+
+    /**
+     * @return array<string, array{value: string, value_type: string, group: string, description: ?string}>
+     */
+    private function readRows(): array
+    {
+        return SystemSetting::query()
             ->get(['key', 'value', 'value_type', 'group', 'description'])
             ->keyBy('key')
             ->map(fn (SystemSetting $setting) => [
@@ -104,7 +129,8 @@ class SettingsRepository
                 'value_type' => $setting->value_type,
                 'group' => $setting->group,
                 'description' => $setting->description,
-            ]));
+            ])
+            ->all();
     }
 
     private function decode(string $raw, string $type): mixed

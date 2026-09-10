@@ -7,3 +7,84 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/*
+ * Tailwind v4 Preflight sets `border: 0` on every element and ships no form
+ * styling, so a control carrying only `border-slate-300 focus:ring-indigo-500`
+ * renders as borderless text with no focus ring. These base rules give the
+ * controls their frame, padding and focus state, standing in for the
+ * @tailwindcss/forms plugin. Utilities still win, so a view can override any
+ * of it per control.
+ */
+@layer base {
+    input:where(
+        [type='text'], [type='email'], [type='password'], [type='search'], [type='url'],
+        [type='tel'], [type='number'], [type='date'], [type='time'], [type='datetime-local'],
+        [type='month'], [type='week']
+    ),
+    select,
+    textarea {
+        appearance: none;
+        border-width: 1px;
+        border-color: var(--color-slate-300);
+        border-radius: var(--radius-lg);
+        background-color: #fff;
+        padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+        font-size: var(--text-sm);
+        line-height: calc(var(--spacing) * 5);
+        color: var(--color-slate-900);
+    }
+
+    /* The native chevron goes away with `appearance: none`, so draw one. */
+    select:where(:not([multiple]):not([size])) {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke='%2394a3b8' stroke-width='1.6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right calc(var(--spacing) * 2.5) center;
+        background-repeat: no-repeat;
+        background-size: 1.25rem 1.25rem;
+        padding-right: calc(var(--spacing) * 9);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--color-slate-400);
+    }
+
+    /*
+     * Focus uses `outline` rather than `box-shadow`: the shadow utilities the
+     * views already carry sit in the utilities layer and would paint over a
+     * base-layer box-shadow the moment a control is focused.
+     */
+    input:where(
+        [type='text'], [type='email'], [type='password'], [type='search'], [type='url'],
+        [type='tel'], [type='number'], [type='date'], [type='time'], [type='datetime-local'],
+        [type='month'], [type='week']
+    ):focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--color-indigo-500);
+        outline: 2px solid var(--color-indigo-500);
+        outline-offset: -1px;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        background-color: var(--color-slate-50);
+        color: var(--color-slate-400);
+        cursor: not-allowed;
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        width: calc(var(--spacing) * 4);
+        height: calc(var(--spacing) * 4);
+        accent-color: var(--color-indigo-600);
+        cursor: pointer;
+    }
+
+    /* Search inputs keep the browser clear button, which fights the frame. */
+    input[type='search']::-webkit-search-decoration,
+    input[type='search']::-webkit-search-cancel-button {
+        appearance: none;
+    }
+}
