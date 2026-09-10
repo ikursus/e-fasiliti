@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
@@ -66,8 +65,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Public URL of the profile photo, or an empty string when none is set.
-     * The photo lives on the "public" disk at profile/{user_id}/{hash}.
+     * URL of the profile photo, or an empty string when none is set. Built
+     * with asset() so it follows the host the app is actually served from
+     * (vhost, port or subdirectory), not APP_URL. The photo lives on the
+     * "public" disk at profile/{user_id}/{hash}.
      */
     public function profilePhotoUrl(): string
     {
@@ -75,7 +76,7 @@ class User extends Authenticatable
             return '';
         }
 
-        return Storage::disk('public')->url($this->profile_photo_path);
+        return asset('storage/'.$this->profile_photo_path);
     }
 
     /**

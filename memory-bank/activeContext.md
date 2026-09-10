@@ -33,3 +33,4 @@
 - Audit `metadata` cast `array`; `user_agent` dipotong 255 (`Str::limit`).
 - Spatie v8 middleware namespace: `Spatie\Permission\Middleware\{RoleMiddleware, PermissionMiddleware}`.
 - Sesi admin: jangan padam/deactivate diri sendiri atau admin aktif terakhir.
+- **URL gambar guna asset(storage/...), bukan Storage::url()** - APP_URL (.env, localhost:8000) tidak sama dengan hos sebenar Apache (port 80): localhost/e-fasiliti2/public atau e-fasiliti2.test; Storage::url jana URL mutlak APP_URL -> 404. Dibaiki dalam User::profilePhotoUrl().
