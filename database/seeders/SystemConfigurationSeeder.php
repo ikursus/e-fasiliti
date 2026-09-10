@@ -7,6 +7,7 @@ use App\Models\NotificationTemplate;
 use App\Models\OperatingHour;
 use App\Models\ReferenceValue;
 use App\Models\SystemSetting;
+use App\Services\Chatbot\GeminiChatService;
 use App\Services\Configuration\SettingsRepository;
 use Illuminate\Database\Seeder;
 
@@ -41,6 +42,12 @@ class SystemConfigurationSeeder extends Seeder
             ['key' => 'umum.bahasa_lalai', 'value' => '"ms"', 'value_type' => 'teks', 'group' => 'umum', 'description' => 'Bahasa lalai antara muka dan notifikasi.'],
             ['key' => 'checkin.threshold_minutes', 'value' => '15', 'value_type' => 'nombor', 'group' => 'daftar-masuk', 'description' => 'Ambang pengesahan kehadiran selepas waktu mula.'],
             ['key' => 'checkin.grace_minutes', 'value' => '15', 'value_type' => 'nombor', 'group' => 'daftar-masuk', 'description' => 'Tempoh anjal sebelum tempahan dilepaskan.'],
+            ['key' => 'chatbot.enabled', 'value' => 'true', 'value_type' => 'boolean', 'group' => 'chatbot', 'description' => 'Aktif atau nyahaktifkan Pembantu AI (chatbot) untuk semua pengguna.'],
+            ['key' => 'chatbot.model', 'value' => '"gemini-2.5-flash"', 'value_type' => 'teks', 'group' => 'chatbot', 'description' => 'Model Gemini daripada Google AI Studio.'],
+            ['key' => 'chatbot.temperature', 'value' => '0.4', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Aras kreativiti balasan (0 hingga 2).'],
+            ['key' => 'chatbot.max_output_tokens', 'value' => '1024', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Had token bagi satu balasan Pembantu AI.'],
+            ['key' => 'chatbot.max_history', 'value' => '20', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Bilangan mesej terdahulu dihantar sebagai konteks perbualan.'],
+            ['key' => 'chatbot.system_prompt', 'value' => json_encode(GeminiChatService::DEFAULT_SYSTEM_PROMPT, JSON_UNESCAPED_UNICODE), 'value_type' => 'teks', 'group' => 'chatbot', 'description' => 'Arahan sistem yang membentuk personaliti Pembantu AI.'],
         ];
 
         foreach ($settings as $setting) {
