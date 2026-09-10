@@ -95,6 +95,19 @@ Perkara berikut dikenal pasti semasa penyediaan matriks ini dan memerlukan perha
 
 Setiap jurang mesti diselesaikan sebelum baseline keperluan ditetapkan. Keperluan tanpa punca perniagaan adalah skop tambahan yang perlu dibuang atau dibenarkan secara eksplisit.
 
+### 5.1 Modul Tambahan M17 — Pembantu AI (Luar Baseline)
+
+Modul M17 (chatbot Google AI Studio) dibina selepas baseline sebagai tambahan yang diminta secara berasingan. Ia tidak berpunca daripada BR atau UR sedia ada; jejakannya dikekalkan di bawah supaya setiap FR masih berakhir dengan kes ujian.
+
+| FR | Keperluan ringkas | TC | Status |
+|---|---|---|---|
+| FR-CHB-01 | Laman chat dengan sejarah dalam DB bagi semua peranan | TC-CHB-01, TC-CHB-02, TC-CHB-15 | Lulus |
+| FR-CHB-02 | Sejarah terhad dihantar ke Gemini; balasan dan token disimpan | TC-CHB-03, TC-CHB-04, TC-CHB-05 | Lulus |
+| FR-CHB-03 | Perbualan baharu dan padam perbualan milik sendiri | TC-CHB-08, TC-CHB-09 | Lulus |
+| FR-CHB-04 | Tajuk automatik daripada mesej pertama | TC-CHB-01 | Lulus |
+| FR-CHB-05 | Tetapan tanpa kod oleh pentadbir sistem | TC-CHB-10 hingga TC-CHB-14 | Lulus |
+| FR-CHB-06 | Kadar had dan ralat mesra (dinyahaktif / tiada kunci / API gagal) | TC-CHB-06, TC-CHB-07, TC-CHB-14 | Lulus |
+
 ## 6. Kawalan Perubahan
 
 Selepas dokumen ini disahkan, sebarang perubahan kepada keperluan mengikut proses berikut.

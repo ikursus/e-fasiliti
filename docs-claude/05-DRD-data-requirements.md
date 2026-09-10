@@ -64,6 +64,8 @@ erDiagram
 
     PENGGUNA ||--o{ LOG_AUDIT : "melakukan"
     PENGGUNA ||--o{ NOTIFIKASI : "menerima"
+    PENGGUNA ||--o{ SESSI_CHATBOT : "memulakan"
+    SESSI_CHATBOT ||--o{ MESEJ_CHATBOT : "mengandungi"
 ```
 
 ## 4. Kamus Data
@@ -419,6 +421,24 @@ Indeks bagi FR-AST-10: `registration_number`, `serial_number`, `location_id`, `s
 | bilangan_cubaan | Integer | Ya | Lalai 0 |
 | dibaca_pada | Cap masa | Tidak | |
 | dicipta_pada | Cap masa | Ya | |
+
+#### SESSI_CHATBOT dan MESEJ_CHATBOT
+
+Entiti chatbot M17. Setiap pengguna memiliki banyak sesi; setiap sesi mengandungi giliran pengguna dan pembantu secara berselang. Mesej dipadam bersama sesinya.
+
+| Medan | Jenis | Wajib | Keterangan |
+|---|---|---|---|
+| SESSI_CHATBOT.id | UUID | Ya | |
+| SESSI_CHATBOT.pengguna_id | UUID | Ya | Pemilik perbualan |
+| SESSI_CHATBOT.tajuk | Teks 150 | Ya | Ditetapkan daripada mesej pertama pengguna |
+| SESSI_CHATBOT.mesej_terakhir_pada | Cap masa | Tidak | Menyusun senarai perbualan, terbaharu dahulu |
+| MESEJ_CHATBOT.id | UUID | Ya | |
+| MESEJ_CHATBOT.sesi_id | UUID | Ya | Rujukan SESSI_CHATBOT |
+| MESEJ_CHATBOT.peranan | Enum | Ya | pengguna, pembantu |
+| MESEJ_CHATBOT.kandungan | Teks panjang | Ya | Kandungan mesej |
+| MESEJ_CHATBOT.token_prompt | Integer | Tidak | Dilaporkan oleh API bagi balasan |
+| MESEJ_CHATBOT.token_balasan | Integer | Tidak | Dilaporkan oleh API bagi balasan |
+| MESEJ_CHATBOT.dicipta_pada | Cap masa | Ya | Menentukan urutan mesej dalam sesi |
 
 ## 5. Peraturan Integriti Data
 

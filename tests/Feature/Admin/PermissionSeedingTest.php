@@ -25,23 +25,27 @@ class PermissionSeedingTest extends TestCase
     private const EXPECTED_GRANTS = [
         'kakitangan' => [
             'aset.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
             'aset.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
             'aset.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
@@ -51,6 +55,7 @@ class PermissionSeedingTest extends TestCase
         ],
         'juruteknik' => [
             'aset.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'unit-organisasi.lihat',
@@ -58,6 +63,7 @@ class PermissionSeedingTest extends TestCase
         'penyelia-ict' => [
             'aset.lihat',
             'audit.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tetapan.lihat',
@@ -69,6 +75,7 @@ class PermissionSeedingTest extends TestCase
             'aset.lihat',
             'aset.padam',
             'audit.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
@@ -82,6 +89,8 @@ class PermissionSeedingTest extends TestCase
             'aset.lihat',
             'aset.padam',
             'audit.lihat',
+            'chatbot.guna',
+            'chatbot.tetapan',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',

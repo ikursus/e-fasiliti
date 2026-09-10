@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\AuditLog;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\Configuration\SettingsRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -115,5 +117,75 @@ class SettingsRepositoryTest extends TestCase
             'description' => 'Keterangan asal.',
         ]);
         $this->assertSame(7, $this->repository()->get('a.satu'));
+    }
+
+    public function test_it_reads_settings_back_from_a_cache_that_refuses_objects(): void
+    {
+        // Production caches to the database store, which honours
+        // cache.serializable_classes. That is false, so the store refuses to
+        // unserialize any object and hands back an __PHP_Incomplete_Class.
+        // Whatever the repository caches therefore has to be plain data.
+        config(['cache.serializable_classes' => false, 'cache.stores.array.serialize' => true]);
+        Cache::purge('array');
+
+        SystemSetting::create(['key' => 'a.satu', 'value' => '1', 'value_type' => 'nombor', 'group' => 'umum']);
+
+        $repository = $this->repository();
+        $repository->get('a.satu');
+
+        $this->assertSame(1, $repository->get('a.satu'));
+        $this->assertSame(['a.satu' => 1], $repository->all()->all());
+    }
+
+    public function test_it_recomputes_when_the_cached_payload_is_unusable(): void
+    {
+        // A cache warmed before this was fixed still holds an object the
+        // store cannot restore. Recompute rather than fail the request.
+        SystemSetting::create(['key' => 'a.satu', 'value' => '1', 'value_type' => 'nombor', 'group' => 'umum']);
+
+        Cache::forever('m01.system_settings', collect(['rosak' => 'payload']));
+
+        $this->assertSame(1, $this->repository()->get('a.satu'));
+    }
+
+    public function test_it_stores_a_secret_encrypted_and_reads_it_back(): void
+    {
+        $this->repository()->set('a.rahsia', 'kunci-super-rahsia', null, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $stored = (string) DB::table('system_settings')->where('key', 'a.rahsia')->value('value');
+
+        $this->assertStringNotContainsString('kunci-super-rahsia', $stored);
+        $this->assertSame('kunci-super-rahsia', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_an_empty_secret_stays_empty(): void
+    {
+        $this->repository()->set('a.rahsia', '', null, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $this->assertSame('', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_a_secret_that_cannot_be_decrypted_reads_as_empty(): void
+    {
+        SystemSetting::create([
+            'key' => 'a.rahsia',
+            'value' => '"bukan-teks-tersulit"',
+            'value_type' => SettingsRepository::SECRET_TYPE,
+            'group' => 'chatbot',
+        ]);
+
+        $this->assertSame('', $this->repository()->get('a.rahsia'));
+    }
+
+    public function test_it_keeps_a_secret_out_of_the_audit_trail(): void
+    {
+        $actor = User::factory()->create();
+
+        $this->repository()->set('a.rahsia', 'kunci-super-rahsia', $actor, SettingsRepository::SECRET_TYPE, 'chatbot');
+
+        $log = AuditLog::query()->latest('id')->first();
+
+        $this->assertStringNotContainsString('kunci-super-rahsia', (string) json_encode($log->metadata));
+        $this->assertTrue($log->metadata['value_redacted']);
     }
 }

@@ -182,6 +182,28 @@ Ini adalah kes ujian yang dirujuk dalam matriks kebolehjejakan. Setiap satu ditu
 | TC-A11Y-02 | Semak nisbah kontras semua kombinasi warna status | Semua sekurang-kurangnya 4.5 banding 1 |
 | TC-CMP-01 | Uji aliran utama pada Chrome, Edge, Firefox dan Safari | Berfungsi sama pada keempat-empat pelayar |
 
+### 4.8 Pembantu AI (M17 — di luar baseline)
+
+Kes ujian berikut dilaksanakan secara automatik dalam `tests/Feature/Chatbot` (24 kes); API Gemini di"sandarkan" supaya ujian tidak memerlukan kunci sebenar.
+
+| TC | Keadaan ujian | Hasil dijangka |
+|---|---|---|
+| TC-CHB-01 | Pengguna menghantar mesej pertama dalam perbualan baharu | Balasan dipaparkan; perbualan dinamakan daripada mesej; kedua-dua giliran tersimpan |
+| TC-CHB-02 | Pengguna tanpa kebenaran chatbot membuka /chatbot | Akses dinafikan; tetapan chatbot hanya untuk pentadbir sistem |
+| TC-CHB-03 | Sejarah melebihi had yang dikonfigurasi | Hanya n mesej terakhir dihantar sebagai konteks |
+| TC-CHB-04 | Permintaan ke Gemini diperiksa | Kunci API, arahan sistem, sejarah dan parameter penjanaan dihantar dengan betul |
+| TC-CHB-05 | API memulangkan ralat pelayan | Mesej ralat mesra; tiada mesej tersimpan |
+| TC-CHB-06 | Chatbot dinyahaktifkan oleh pentadbir | Mesej dinyahaktifkan; tiada mesej tersimpan |
+| TC-CHB-07 | Kunci API tidak dikonfigurasi | Mesej ralat konfigurasi; tiada mesej tersimpan |
+| TC-CHB-08 | Padam perbualan milik sendiri | Perbualan dan semua mesejnya dipadam |
+| TC-CHB-09 | Menghantar mesej / memadam perbualan pengguna lain | Dinafikan (404) |
+| TC-CHB-10 | Pentadbir sistem membuka dan menyimpan tetapan baharu | Tetapan tersimpan dan perubahan direkod dalam jejak audit |
+| TC-CHB-11 | Suhu melebihi 2 | Ditolak dengan mesej pengesahan; nilai lama kekal |
+| TC-CHB-12 | Nama model mengandungi aksara URL | Ditolak dengan mesej pengesahan |
+| TC-CHB-13 | Kotak semak aktif dinyahaktif semasa menyimpan | Chatbot menjadi tidak aktif |
+| TC-CHB-14 | Mesej kosong atau melebihi 4,000 aksara | Ditolak dengan mesej pengesahan |
+| TC-CHB-15 | Setiap satu daripada lapan peranan membuka /chatbot | Semua boleh mengakses (chatbot.guna diberi kepada semua) |
+
 ## 5. Skrip UAT
 
 Skrip ini dijalankan oleh pengguna sebenar, bukan penguji teknikal. Setiap skrip ditulis dalam bahasa yang boleh diikuti tanpa pengetahuan teknikal.
