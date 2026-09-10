@@ -6,8 +6,8 @@ use App\Enums\ReferenceValueType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoomStoreRequest;
 use App\Http\Requests\Admin\RoomUpdateRequest;
+use App\Models\OperatingHour;
 use App\Models\ReferenceValue;
-use App\Models\Role;
 use App\Models\Room;
 use App\Models\User;
 use App\Services\Audit\AuditRecorder;
@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 /**
  * M04 — meeting room catalogue (FR-BLK-01..06, FR-BLK-08).
@@ -117,7 +118,35 @@ class RoomController extends Controller
             'layoutOptions' => $this->layoutOptions(),
             'facilityOptions' => $this->facilityOptions(),
             'roleOptions' => $this->roleOptions(),
+            'hours' => $this->hoursForForm($room),
         ]);
+    }
+
+    /**
+     * Seven-day grid for the edit form. A day the room has no row for
+     * falls back to the organisation default, then to a sane office day —
+     * identical fallback the M05 engine will use at read time.
+     *
+     * @return array<int, array{is_closed: bool, opens_at: string, closes_at: string}>
+     */
+    private function hoursForForm(Room $room): array
+    {
+        $roomHours = $room->operatingHours->keyBy('day_of_week');
+        $orgDefaults = OperatingHour::query()->organisationDefault()->get()->keyBy('day_of_week');
+
+        $days = [];
+
+        foreach (range(0, 6) as $day) {
+            $row = $roomHours->get($day) ?? $orgDefaults->get($day);
+
+            $days[$day] = [
+                'is_closed' => $row?->is_closed ?? in_array($day, [0, 6], true),
+                'opens_at' => $row?->opens_at !== null ? substr((string) $row->opens_at, 0, 5) : '08:00',
+                'closes_at' => $row?->closes_at !== null ? substr((string) $row->closes_at, 0, 5) : '17:00',
+            ];
+        }
+
+        return $days;
     }
 
     public function update(RoomUpdateRequest $request, Room $room): RedirectResponse

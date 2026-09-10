@@ -110,6 +110,15 @@
                     </a>
                 @endcan
 
+                @can('bilik.lihat')
+                    <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fasiliti</p>
+                    <a href="{{ route('admin.rooms.index') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.rooms*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Bilik Mesyuarat
+                    </a>
+                @endcan
+
                 @can('tetapan.lihat')
                     <a href="{{ route('admin.settings.general') }}"
                        @click="sidebarOpen = false"
@@ -139,7 +148,7 @@
                 @endif
 
                 <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Modul (akan datang)</p>
-                <p class="px-3 py-2 text-sm text-slate-500">Tempahan Bilik Mesyuarat</p>
+                <p class="px-3 py-2 text-sm text-slate-500">Enjin Tempahan &amp; Kalendar</p>
                 <p class="px-3 py-2 text-sm text-slate-500">Aduan &amp; Tiket ICT</p>
                 <p class="px-3 py-2 text-sm text-slate-500">Inventari Aset</p>
             </nav>
