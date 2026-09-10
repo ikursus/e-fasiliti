@@ -25,32 +25,47 @@ class PermissionSeedingTest extends TestCase
     private const EXPECTED_GRANTS = [
         'kakitangan' => [
             'aset.lihat',
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.buka',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
             'aset.lihat',
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.buka',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'bilik.lihat',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.lihat-semua',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
             'aset.lihat',
+            'bilik.cipta',
+            'bilik.kemaskini',
+            'bilik.lihat',
+            'bilik.padam',
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
             'lokasi.lihat',
             'tetapan.lihat',
+            'tiket.lihat-semua',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
@@ -58,6 +73,8 @@ class PermissionSeedingTest extends TestCase
             'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.kemas-kini',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'penyelia-ict' => [
@@ -67,6 +84,13 @@ class PermissionSeedingTest extends TestCase
             'laporan.lihat',
             'lokasi.lihat',
             'tetapan.lihat',
+            'tiket.agih',
+            'tiket.buka',
+            'tiket.kemas-kini',
+            'tiket.keutamaan',
+            'tiket.lihat-semua',
+            'tiket.lihat-sendiri',
+            'tiket.tutup',
             'unit-organisasi.lihat',
         ],
         'pegawai-aset' => [
@@ -81,6 +105,8 @@ class PermissionSeedingTest extends TestCase
             'lokasi.kemaskini',
             'lokasi.lihat',
             'tetapan.lihat',
+            'tiket.lihat-semua',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'pentadbir-sistem' => [
@@ -89,6 +115,10 @@ class PermissionSeedingTest extends TestCase
             'aset.lihat',
             'aset.padam',
             'audit.lihat',
+            'bilik.cipta',
+            'bilik.kemaskini',
+            'bilik.lihat',
+            'bilik.padam',
             'chatbot.guna',
             'chatbot.tetapan',
             'laporan.lihat',
@@ -106,6 +136,13 @@ class PermissionSeedingTest extends TestCase
             'peranan.padam',
             'tetapan.kemaskini',
             'tetapan.lihat',
+            'tiket.agih',
+            'tiket.buka',
+            'tiket.kemas-kini',
+            'tiket.keutamaan',
+            'tiket.lihat-semua',
+            'tiket.lihat-sendiri',
+            'tiket.tutup',
             'unit-organisasi.cipta',
             'unit-organisasi.kemaskini',
             'unit-organisasi.lihat',
@@ -158,6 +195,30 @@ class PermissionSeedingTest extends TestCase
                 Role::findByName($slug)->hasPermissionTo('lokasi.lihat'),
                 "Peranan {$slug} sepatutnya boleh melihat lokasi."
             );
+        }
+    }
+
+    public function test_room_catalog_permissions_follow_the_matrix(): void
+    {
+        $mayRead = ['kakitangan', 'setiausaha', 'pelulus', 'pentadbir-fasiliti', 'pentadbir-sistem'];
+        $mayWrite = ['pentadbir-fasiliti', 'pentadbir-sistem'];
+
+        foreach (array_keys(RolesAndPermissionsSeeder::ROLES) as $slug) {
+            $role = Role::findByName($slug);
+
+            $this->assertSame(
+                in_array($slug, $mayRead, true),
+                $role->hasPermissionTo('bilik.lihat'),
+                "Kebenaran bilik.lihat salah bagi peranan {$slug}."
+            );
+
+            foreach (['cipta', 'kemaskini', 'padam'] as $verb) {
+                $this->assertSame(
+                    in_array($slug, $mayWrite, true),
+                    $role->hasPermissionTo("bilik.{$verb}"),
+                    "Kebenaran bilik.{$verb} salah bagi peranan {$slug}."
+                );
+            }
         }
     }
 

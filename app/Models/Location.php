@@ -65,6 +65,15 @@ class Location extends Model
     }
 
     /**
+     * Meeting rooms situated here (M04). A room must sit at ruang level,
+     * which the M04 form requests enforce.
+     */
+    public function rooms(): HasMany
+    {
+        return $this->hasMany(Room::class, 'location_id');
+    }
+
+    /**
      * Only records that are still in use (FR-ORG-04).
      *
      * @param  Builder<self>  $query
@@ -160,7 +169,7 @@ class Location extends Model
 
     /**
      * Reasons this location may not be deleted (FR-ORG-03). An empty list
-     * means deletion is safe. M04 rooms and M09 assets add a line here.
+     * means deletion is safe. M09 assets add another line here when built.
      *
      * @return array<int, string>
      */
@@ -170,6 +179,10 @@ class Location extends Model
 
         if ($this->children()->exists()) {
             $reasons[] = 'lokasi anak';
+        }
+
+        if ($this->rooms()->exists()) {
+            $reasons[] = 'bilik';
         }
 
         if ($this->users()->exists()) {

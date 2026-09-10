@@ -54,6 +54,34 @@
                     Papan Pemuka
                 </a>
 
+                @canany(['tiket.lihat-sendiri', 'tiket.kemas-kini', 'tiket.lihat-semua'])
+                    <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tiket ICT</p>
+                @endcanany
+
+                @can('tiket.lihat-sendiri')
+                    <a href="{{ route('tiket.index') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('tiket.index') || request()->routeIs('tiket.create') || request()->routeIs('tiket.show') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Aduan Saya
+                    </a>
+                @endcan
+
+                @can('tiket.kemas-kini')
+                    <a href="{{ route('tiket.tugasan') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('tiket.tugasan') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Tugasan Saya
+                    </a>
+                @endcan
+
+                @can('tiket.lihat-semua')
+                    <a href="{{ route('tiket.senarai') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('tiket.senarai') || request()->routeIs('tiket.agih*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Semua Tiket
+                    </a>
+                @endcan
+
                 @can('chatbot.guna')
                     <a href="{{ route('chatbot.index') }}"
                        @click="sidebarOpen = false"
@@ -79,6 +107,15 @@
                        @click="sidebarOpen = false"
                        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.organization-units*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         Unit Organisasi
+                    </a>
+                @endcan
+
+                @can('bilik.lihat')
+                    <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fasiliti</p>
+                    <a href="{{ route('admin.rooms.index') }}"
+                       @click="sidebarOpen = false"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.rooms*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        Bilik Mesyuarat
                     </a>
                 @endcan
 
@@ -120,7 +157,7 @@
                 @endcan
 
                 <p class="mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Modul (akan datang)</p>
-                <p class="px-3 py-2 text-sm text-slate-500">Tempahan Bilik Mesyuarat</p>
+                <p class="px-3 py-2 text-sm text-slate-500">Enjin Tempahan &amp; Kalendar</p>
                 <p class="px-3 py-2 text-sm text-slate-500">Aduan &amp; Tiket ICT</p>
             </nav>
 
