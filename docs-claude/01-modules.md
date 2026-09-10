@@ -1,6 +1,6 @@
 # 01 — Senarai & Peta Modul
 
-Sistem dipecahkan kepada 16 modul. Setiap modul mempunyai satu tanggungjawab jelas, antara muka yang boleh diterangkan tanpa membaca dalamannya, dan boleh diuji secara berasingan.
+Sistem dipecahkan kepada 17 modul. Setiap modul mempunyai satu tanggungjawab jelas, antara muka yang boleh diterangkan tanpa membaca dalamannya, dan boleh diuji secara berasingan.
 
 ---
 
@@ -31,6 +31,7 @@ graph TB
     subgraph RENTAS["Lapisan Perkhidmatan Rentas"]
         M14[M14 Notifikasi & Integrasi]
         M15[M15 Laporan, Dashboard & Analitik]
+        M17[M17 Pembantu AI (Chatbot)]
     end
 
     M02 --> M05
@@ -51,6 +52,7 @@ graph TB
     M05 --> M15
     M10 --> M15
     M16 --> M15
+    M01 --> M17
 ```
 
 ---
@@ -86,6 +88,13 @@ Merekod setiap perubahan data penting: siapa, bila, nilai sebelum dan selepas. L
 - **Antara muka keluar:** perkhidmatan rekod audit, dan paparan carian log untuk pentadbir dan juruaudit.
 - **Bergantung kepada:** M02.
 - **Rujukan FR:** FR-AUD-01 hingga FR-AUD-05.
+
+#### M17 — Pembantu AI (Chatbot)
+Pembantu perbualan dalam Bahasa Melayu yang dibina di atas Google AI Studio (Gemini API). Menjawab soalan pengguna tentang prosedur sistem — tempahan bilik, aduan ICT, inventari aset — dengan sejarah perbualan setiap pengguna disimpan dalam sistem, dan tetapan boleh diubah pentadbir tanpa menulis kod.
+
+- **Antara muka keluar:** servis `GeminiChatService` dan tetapan kumpulan `chatbot` (model, suhu, had token, had sejarah, arahan sistem).
+- **Bergantung kepada:** M01 (tetapan), M02 (peranan dan kebenaran), direktori luaran (Gemini API).
+- **Rujukan FR:** FR-CHB-01 hingga FR-CHB-06.
 
 ### Domain A — Tempahan Bilik Mesyuarat
 
@@ -181,7 +190,7 @@ Papan pemuka mengikut peranan dan laporan berkanun. Semua laporan boleh diekspor
 
 ## 3. Matriks Peranan Berbanding Modul
 
-Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus atau sahkan, **—** tiada akses.
+Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus atau sahkan, **G** guna (sesi chatbot), **—** tiada akses.
 
 | Modul | Kakitangan | Setiausaha | Pelulus | Pentadbir Fasiliti | Juruteknik | Penyelia ICT | Pegawai Aset | Pentadbir Sistem |
 |---|---|---|---|---|---|---|---|---|
@@ -201,6 +210,7 @@ Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus ata
 | M14 Notifikasi | R sendiri | R | R | R | R | R | R | CRUD templat |
 | M15 Laporan | R sendiri | R unit | R unit | R fasiliti | R sendiri | R semua ICT | R aset | R semua |
 | M16 Audit | — | — | — | — | — | R skop ICT | R skop aset | R semua |
+| M17 Pembantu AI | G | G | G | G | G | G | G | G + CRUD tetapan |
 
 ---
 
@@ -212,5 +222,6 @@ Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus ata
 | Fasa 2, Aset dan Tiket | M09, M10, M13, M15 (laporan teras) | Inventori aset berlabel QR dan helpdesk kerosakan dengan SLA | 10 minggu |
 | Fasa 3, Pematangan | M07, M08, M11, M12, M14 (ICS), M15 (analitik penuh) | Pelepasan automatik, penyelenggaraan preventif, vendor, papan pemuka | 8 minggu |
 | Fasa 4, Pilihan | Aplikasi mudah alih natif, integrasi kewangan, papan tanda bilik | Mengikut keputusan selepas kajian faedah | Belum ditetapkan |
+| Dibina (tambahan) | M17 Pembantu AI | Chatbot Google AI Studio untuk semua peranan, tetapan tanpa kod | Selesai (cawangan `chatbot`) |
 
 Prinsip pemecahan fasa: setiap fasa mesti menghasilkan sesuatu yang boleh digunakan sepenuhnya oleh sekurang-kurangnya satu kumpulan pengguna. Fasa 1 memberi nilai kepada semua kakitangan. Fasa 2 memberi nilai kepada unit ICT. Fasa 3 memperbaiki kualiti data dan mengurangkan kerja manual yang berbaki.

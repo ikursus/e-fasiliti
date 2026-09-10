@@ -27,7 +27,9 @@ class AuditLog extends Model
     {
         return [
             'metadata' => 'array',
-            'record_id' => 'integer',
+            // SystemSetting is keyed by its string `key`, so this column
+            // holds ids of both kinds and is always read back as a string.
+            'record_id' => 'string',
         ];
     }
 

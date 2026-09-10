@@ -7,6 +7,7 @@ use App\Models\NotificationTemplate;
 use App\Models\OperatingHour;
 use App\Models\ReferenceValue;
 use App\Models\SystemSetting;
+use App\Services\Chatbot\GeminiChatService;
 use App\Services\Configuration\SettingsRepository;
 use Illuminate\Database\Seeder;
 
@@ -48,6 +49,13 @@ class SystemConfigurationSeeder extends Seeder
             ['key' => 'sla.P3.pemulihan_minit', 'value' => '1440', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P3 Sederhana — sasaran pemulihan (minit bekerja).'],
             ['key' => 'sla.P4.tindak_balas_minit', 'value' => '480', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P4 Rendah — sasaran tindak balas (minit bekerja).'],
             ['key' => 'sla.P4.pemulihan_minit', 'value' => '2400', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P4 Rendah — sasaran pemulihan (minit bekerja).'],
+            ['key' => 'chatbot.enabled', 'value' => 'true', 'value_type' => 'boolean', 'group' => 'chatbot', 'description' => 'Aktif atau nyahaktifkan Pembantu AI (chatbot) untuk semua pengguna.'],
+            ['key' => 'chatbot.model', 'value' => '"gemini-3.6-flash"', 'value_type' => 'teks', 'group' => 'chatbot', 'description' => 'Model Gemini daripada Google AI Studio.'],
+            ['key' => 'chatbot.temperature', 'value' => '0.4', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Aras kreativiti balasan (0 hingga 2).'],
+            ['key' => 'chatbot.max_output_tokens', 'value' => '1024', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Had token bagi satu balasan Pembantu AI.'],
+            ['key' => 'chatbot.max_history', 'value' => '20', 'value_type' => 'nombor', 'group' => 'chatbot', 'description' => 'Bilangan mesej terdahulu dihantar sebagai konteks perbualan.'],
+            ['key' => 'chatbot.api_key', 'value' => '""', 'value_type' => 'rahsia', 'group' => 'chatbot', 'description' => 'Kunci API Google AI Studio, disimpan tersulit. Kosong bermakna kunci diambil daripada GEMINI_API_KEY.'],
+            ['key' => 'chatbot.system_prompt', 'value' => json_encode(GeminiChatService::DEFAULT_SYSTEM_PROMPT, JSON_UNESCAPED_UNICODE), 'value_type' => 'teks', 'group' => 'chatbot', 'description' => 'Arahan sistem yang membentuk personaliti Pembantu AI.'],
         ];
 
         foreach ($settings as $setting) {

@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\AuditLog;
 use App\Models\Location;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Services\Audit\AuditRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +28,25 @@ class AuditRecorderTest extends TestCase
         $this->assertSame('location.created', $log->action);
         $this->assertSame('success', $log->status);
         $this->assertSame('location', $log->record_type);
-        $this->assertSame($location->id, $log->record_id);
+        $this->assertSame((string) $location->id, $log->record_id);
+    }
+
+    public function test_it_records_a_target_whose_primary_key_is_a_string(): void
+    {
+        $actor = User::factory()->create();
+        $setting = SystemSetting::create([
+            'key' => 'chatbot.enabled',
+            'value' => 'true',
+            'value_type' => 'boolean',
+            'group' => 'chatbot',
+        ]);
+
+        app(AuditRecorder::class)->record($actor, 'setting.updated', $setting);
+
+        $log = AuditLog::query()->latest('id')->first();
+
+        $this->assertSame('system_setting', $log->record_type);
+        $this->assertSame('chatbot.enabled', $log->record_id);
     }
 
     public function test_it_records_only_the_fields_that_changed(): void

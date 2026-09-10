@@ -56,6 +56,10 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // M15 — Laporan
         'laporan.lihat',
+
+        // M17 — Pembantu AI (Chatbot)
+        'chatbot.guna',
+        'chatbot.tetapan',
     ];
 
     /**
@@ -101,6 +105,7 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public const ROLE_PERMISSIONS = [
         'kakitangan' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.buka',
@@ -108,6 +113,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.buka',
@@ -115,6 +121,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.lihat-sendiri',
@@ -122,6 +129,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'chatbot.guna',
             'laporan.lihat',
             'tetapan.lihat',
             'lokasi.lihat',
@@ -132,6 +140,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.kemas-kini',
@@ -139,6 +148,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'penyelia-ict' => [
+            'chatbot.guna',
             'laporan.lihat',
             'audit.lihat',
             'tetapan.lihat',
@@ -153,6 +163,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'unit-organisasi.lihat',
         ],
         'pegawai-aset' => [
+            'chatbot.guna',
             'laporan.lihat',
             'audit.lihat',
             'tetapan.lihat',

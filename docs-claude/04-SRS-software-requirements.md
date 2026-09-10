@@ -353,6 +353,17 @@ stateDiagram-v2
 | FR-AUD-04 | Log audit MESTI tidak boleh disunting atau dipadam melalui antara muka pengguna oleh mana-mana peranan | W | UR-43 |
 | FR-AUD-05 | Sistem MESTI menyediakan carian log mengikut pengguna, jenis rekod, jenis tindakan dan julat tarikh | W | UR-43 |
 
+### M17 — Pembantu AI (Chatbot)
+
+| ID | Keperluan | Keutamaan | URS |
+|---|---|---|---|
+| FR-CHB-01 | Sistem MESTI menyediakan laman chat Pembantu AI bagi setiap pengguna yang mengesahkan masuk, dengan sejarah perbualan masing-masing disimpan dalam pangkalan data | W | — |
+| FR-CHB-02 | Sistem MESTI menghantar mesej baharu beserta sejarah terhad (lalai 20 mesej terakhir, tertua dahulu) kepada Gemini API, dan menyimpan balasan berserta bilangan token yang dilaporkan | W | — |
+| FR-CHB-03 | Sistem MESTI membenarkan pengguna membuka perbualan baharu dan memadam perbualan milik sendiri sahaja | W | — |
+| FR-CHB-04 | Sistem SEPATUTNYA menamakan perbualan secara automatik daripada mesej pertama pengguna | W2 | — |
+| FR-CHB-05 | Sistem MESTI membenarkan R8 mengkonfigurasi chatbot tanpa menulis kod — aktif/nyahaktif, model, suhu, had token balasan, had sejarah, arahan sistem — dan kunci API kekal dalam persekitaran pelayan | W | — |
+| FR-CHB-06 | Sistem MESTI menghadkan kadar penghantaran mesej (lalai 20 seminit bagi setiap pengguna) dan memaparkan mesej ralat mesra apabila chatbot dinyahaktifkan, kunci API tidak dikonfigurasi, atau API gagal; tiada mesej disimpan bagi giliran yang gagal | W | — |
+
 ---
 
 ## 4. Ringkasan Bilangan Keperluan
@@ -375,7 +386,10 @@ stateDiagram-v2
 | M14 Notifikasi | 5 | 2 | 1 | 1 | 9 |
 | M15 Laporan | 3 | 5 | 3 | 1 | 12 |
 | M16 Audit | 5 | 0 | 0 | 0 | 5 |
-| **Jumlah** | **58** | **54** | **35** | **5** | **152** |
+| M17 Pembantu AI | 5 | 1 | 0 | 0 | 6 |
+| **Jumlah** | **63** | **55** | **35** | **5** | **158** |
+
+Nota: M17 Pembantu AI dibina di luar baseline fasa asal sebagai tambahan yang diminta selepas dokumen ini didrafkan (lihat 01-modules.md §4, baris "Dibina (tambahan)"). Lajur fasa bagi baris M17 dipetakan kepada keutamaan FR, bukan kepada fasa asal.
 
 ## 5. Isu Terbuka
 

@@ -24,6 +24,7 @@ class PermissionSeedingTest extends TestCase
      */
     private const EXPECTED_GRANTS = [
         'kakitangan' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.buka',
@@ -31,6 +32,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.buka',
@@ -38,6 +40,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.lihat-semua',
@@ -45,6 +48,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
@@ -55,6 +59,7 @@ class PermissionSeedingTest extends TestCase
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tiket.kemas-kini',
@@ -63,6 +68,7 @@ class PermissionSeedingTest extends TestCase
         ],
         'penyelia-ict' => [
             'audit.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.lihat',
             'tetapan.lihat',
@@ -77,6 +83,7 @@ class PermissionSeedingTest extends TestCase
         ],
         'pegawai-aset' => [
             'audit.lihat',
+            'chatbot.guna',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
@@ -88,6 +95,8 @@ class PermissionSeedingTest extends TestCase
         ],
         'pentadbir-sistem' => [
             'audit.lihat',
+            'chatbot.guna',
+            'chatbot.tetapan',
             'laporan.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
