@@ -34,7 +34,7 @@ class ChatbotSettingsTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('admin.settings.chatbot'))
             ->assertOk()
-            ->assertSee('gemini-2.5-flash')
+            ->assertSee('gemini-3.6-flash')
             ->assertSee('chatbot_system_prompt', false);
     }
 
@@ -66,7 +66,7 @@ class ChatbotSettingsTest extends TestCase
         $this->actingAs($this->admin)
             ->put(route('admin.settings.chatbot.update'), [
                 'chatbot_enabled' => '0',
-                'chatbot_model' => 'gemini-2.5-flash',
+                'chatbot_model' => 'gemini-3.6-flash',
                 'chatbot_temperature' => '0.4',
                 'chatbot_max_output_tokens' => '1024',
                 'chatbot_max_history' => '20',
@@ -82,7 +82,7 @@ class ChatbotSettingsTest extends TestCase
         $this->actingAs($this->admin)
             ->put(route('admin.settings.chatbot.update'), [
                 'chatbot_enabled' => '1',
-                'chatbot_model' => 'gemini-2.5-flash',
+                'chatbot_model' => 'gemini-3.6-flash',
                 'chatbot_temperature' => '5',
                 'chatbot_max_output_tokens' => '1024',
                 'chatbot_max_history' => '20',
@@ -119,7 +119,7 @@ class ChatbotSettingsTest extends TestCase
     {
         return array_merge([
             'chatbot_enabled' => '1',
-            'chatbot_model' => 'gemini-2.5-flash',
+            'chatbot_model' => 'gemini-3.6-flash',
             'chatbot_temperature' => '0.4',
             'chatbot_max_output_tokens' => '1024',
             'chatbot_max_history' => '20',

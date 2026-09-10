@@ -28,7 +28,7 @@ class ChatbotSettingsController extends Controller
     {
         return view('admin.settings.chatbot', [
             'enabled' => (bool) $this->settings->get('chatbot.enabled', false),
-            'model' => (string) $this->settings->get('chatbot.model', 'gemini-2.5-flash'),
+            'model' => (string) $this->settings->get('chatbot.model', GeminiChatService::DEFAULT_MODEL),
             'temperature' => (float) $this->settings->get('chatbot.temperature', 0.4),
             'maxOutputTokens' => (int) $this->settings->get('chatbot.max_output_tokens', 1024),
             'maxHistory' => (int) $this->settings->get('chatbot.max_history', 20),

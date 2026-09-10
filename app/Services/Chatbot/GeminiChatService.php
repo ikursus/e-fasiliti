@@ -27,6 +27,15 @@ class GeminiChatService
     public const DEFAULT_SYSTEM_PROMPT = 'Anda ialah Pembantu AI bagi sistem e-Fasiliti (Pengurusan Fasiliti & Aset ICT). Jawab dalam Bahasa Melayu yang ringkas, jelas dan sopan. Tumpukan pada membantu pengguna tentang tempahan bilik mesyuarat, aduan kerosakan ICT, inventari aset dan prosedur sistem e-Fasiliti. Jika pertanyaan di luar skop itu, jawab dengan sopan bahawa anda hanya membantu perkara berkaitan e-Fasiliti. Jangan mengarang fakta tentang data sistem; jika tidak pasti, nasihatkan pengguna menyemak modul berkaitan atau menghubungi pentadbir sistem.';
 
     /**
+     * Model used when chatbot.model has no row yet.
+     *
+     * Google retires older models for new projects, and a retired name
+     * fails with a 404 naming its replacement. Read the log when the
+     * assistant starts reporting a service problem.
+     */
+    public const DEFAULT_MODEL = 'gemini-3.6-flash';
+
+    /**
      * Settings key holding the Gemini API key, stored encrypted.
      */
     public const API_KEY_SETTING = 'chatbot.api_key';
@@ -159,7 +168,7 @@ class GeminiChatService
         return sprintf(
             '%s/models/%s:generateContent',
             rtrim((string) config('services.gemini.base_url'), '/'),
-            (string) $this->settings->get('chatbot.model', 'gemini-2.5-flash'),
+            (string) $this->settings->get('chatbot.model', self::DEFAULT_MODEL),
         );
     }
 

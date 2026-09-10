@@ -93,9 +93,9 @@
                 <label for="chatbot_model" class="block text-sm font-medium text-slate-700">Model Gemini</label>
                 <input type="text" id="chatbot_model" name="chatbot_model"
                        value="{{ old('chatbot_model', $model) }}" required maxlength="100"
-                       placeholder="gemini-2.5-flash"
+                       placeholder="gemini-3.6-flash"
                        class="mt-1 block w-full shadow-sm">
-                <p class="mt-1 text-xs text-slate-500">Contoh: gemini-2.5-flash, gemini-2.5-pro.</p>
+                <p class="mt-1 text-xs text-slate-500">Contoh: gemini-3.6-flash. Model yang ditarik balik oleh Google akan gagal dengan status 404.</p>
                 @error('chatbot_model')<p class="mt-1 text-sm text-rose-600">{{ $message }}</p>@enderror
             </div>
 

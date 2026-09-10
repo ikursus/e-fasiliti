@@ -62,7 +62,7 @@ class GeminiChatServiceTest extends TestCase
         $this->service->send('Soalan baharu', collect([$history]));
 
         Http::assertSent(function ($request) {
-            return str_contains($request->url(), '/models/gemini-2.5-flash:generateContent')
+            return str_contains($request->url(), '/models/gemini-3.6-flash:generateContent')
                 && $request->hasHeader('x-goog-api-key', 'test-key')
                 && data_get($request, 'systemInstruction.parts.0.text') !== null
                 && data_get($request, 'contents.0.role') === 'user'

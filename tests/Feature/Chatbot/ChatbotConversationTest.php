@@ -103,7 +103,7 @@ class ChatbotConversationTest extends TestCase
             $contents = data_get($request, 'contents');
 
             return $request->hasHeader('x-goog-api-key', 'test-key')
-                && str_contains($request->url(), '/models/gemini-2.5-flash:generateContent')
+                && str_contains($request->url(), '/models/gemini-3.6-flash:generateContent')
                 && data_get($request, 'systemInstruction.parts.0.text') !== null
                 && data_get($request, 'generationConfig.temperature') === 0.4
                 && data_get($request, 'generationConfig.maxOutputTokens') === 1024
