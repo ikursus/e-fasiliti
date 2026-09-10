@@ -58,6 +58,12 @@ class Location extends Model
         return $this->hasMany(User::class, 'primary_location_id');
     }
 
+    /**      * ICT assets currently placed at this location (M09, FR-AST-05).      */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'location_id');
+    }
+
     /**
      * Meeting rooms situated here (M04). A room must sit at ruang level,
      * which the M04 form requests enforce.
@@ -181,6 +187,10 @@ class Location extends Model
 
         if ($this->users()->exists()) {
             $reasons[] = 'pengguna';
+        }
+
+        if ($this->assets()->exists()) {
+            $reasons[] = 'aset';
         }
 
         return $reasons;

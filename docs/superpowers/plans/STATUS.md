@@ -1,5 +1,58 @@
 # Status Pelaksanaan — kemas kini 9 September 2026
 
+## SEMASA — M09 Inventori Aset ICT (branch `inventori-aset`)
+
+Pembangunan M09 bermula 9 September 2026 di atas keputusan yang direkodkan dalam `docs-claude` (commit `cff9511` pada branch ini):
+
+- CRUD aset terhad kepada **pegawai-aset** dan **pentadbir-sistem**; juruteknik **R sahaja** (penyimpangan matriks, lihat nota di 01-modules.md §3); kakitangan **R sendiri** (skop `responsible_user_id`); pelulus tiada akses.
+- No. pendaftaran **manual** pada fasa 1 (keputusan ISU-04); `qr_code` ialah token yang dijana sistem semasa daftar; vendor pembekal ditangguhkan ke M12.
+- Kategori aset melalui `reference_values` type `kategori_aset`; pemetaan skema penuh di 05-DRD §4.3.
+
+### Selesai (dicommit bersama nota ini)
+
+| Tugasan | Fail |
+|---|---|
+| T1 | `app/Enums/AssetStatus.php` (5 status + label BM + badge), `app/Enums/AssetEventType.php` |
+| T2 | `database/migrations/2026_09_09_120000_create_assets_table.php`, `2026_09_09_120100_create_asset_histories_table.php` |
+| T3 | `app/Models/Asset.php` (casts, 4 hubungan, `scopeSearch`, `scopeVisibleTo`, `movementSnapshot()`, `auditSnapshot()`, `warrantyStatus()`), `app/Models/AssetHistory.php` |
+| T3 | `database/factories/AssetFactory.php` (state: simpanan/dalamPembaikan/tidakAktif/dilupuskan/inWarranty/outOfWarranty/ownedBy/atLocation/withCategory), `AssetHistoryFactory.php` |
+| T4 | `app/Models/Location.php`: hubungan `assets()` + sebab `'aset'` dalam `referenceSummary()` |
+| T6 | `app/Http/Requests/Admin/AssetStoreRequest.php` (peraturan DRD, kategori/lokasi/pengguna mesti aktif, mesej BM), `AssetUpdateRequest.php` (unique ignore sendiri + `reason` wajib bila lokasi/pemilik/status berubah melalui `after()`) |
+
+### Siap (T5–T10, 9 September 2026)
+
+- **T5** — `RolesAndPermissionsSeeder`: 4 kebenaran `aset.*` + peruntukan (pegawai-aset & pentadbir-sistem menulis; kakitangan/setiausaha/pentadbir-fasiliti/juruteknik/penyelia-ict `aset.lihat`; pelulus tiada) + docblock penyimpangan; `PermissionSeedingTest` `EXPECTED_GRANTS` + ujian matriks baharu.
+- **T7** — `app/Http/Controllers/Admin/AssetController.php` (index: carian + 4 penapis + `visibleTo` + `paginate(15)`; store: transaksi + `qr_code` Str::uuid + sejarah `didaftar` + audit selepas refresh; show: `ensureVisible` 404 skop kakitangan; update: `movementEvents()` → sejarah bersebab; destroy: audit before) + 7 route `admin/assets.*` dengan `can:aset.*` (import+guna satu suntingan).
+- **T8** — 5 paparan `resources/views/admin/assets/` (index jadual+pagination+penapis, `_form` kongsi dengan `location-picker`, create, edit, show dengan waranti + jadual sejarah) + sidebar seksyen "Aset" (placeholder "Inventari Aset" dibuang).
+- **T9** — ujian baharu: `AssetStatusTest`, `AssetTest`, `AssetSchemaTest`, `AssetManagementTest`, `AssetHistoryTest`, kemas kini `PermissionSeedingTest`.
+- **T10** — `php artisan migrate` berjalan (jadual `assets` + `asset_histories` kini wujud dalam DB dev `efasiliti2`); pint lulus; phpunit hijau penuh.
+
+### Keputusan ujian penuh (9 September 2026)
+
+| Set | Keputusan |
+|---|---|
+| tests/Unit | 75 / 75 OK |
+| tests/Feature/Admin | 157 / 157 OK |
+| tests/Feature root | 19 / 19 OK + AuthenticationTest 7 / 7 OK |
+| **Jumlah** | **258 / 258 OK** |
+
+### Isu persekitaran ditemui (bukan regresi M09)
+
+- `.env` menetapkan `APP_LOCALE=en` → mesej throttle log masuk keluar dalam bahasa Inggeris → `AuthenticationTest::test_account_is_locked_after_five_failed_attempts` gagal. Dibuktikan: dengan `APP_LOCALE=ms` ujian lulus 7/7. Cadangan (BR-07/NFR-U08): tetapkan `APP_LOCALE=ms` — menunggu keputusan pengguna.
+- Laragon PHP tidak memuatkan php.ini dari shell ini; guna `storage/run_tests.cmd <laluan-ujian>` atau `-d extension_dir=... -d extension=...` (lihat nota bawah).
+
+### Baki (menunggu / fasa susulan M09)
+
+1. ~~Jalankan `php artisan db:seed --class=RolesAndPermissionsSeeder`~~ **SELESAI** — kebenaran `aset.*` telah dijana dan disahkan dalam DB dev (pegawai-aset 4/4, juruteknik R sahaja, pelulus tiada).
+2. FR-AST-03 penjanaan no. pendaftaran automatik; FR-AST-08/09 label QR; FR-AST-12/13 import/eksport; FR-AST-14 pelupusan berperingkat; FR-AST-11 penuh selepas M10/M11; vendor M12.
+### Nota persekitaran
+
+- `php` tiada pada PATH → `C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\php.exe`.
+- Laragon PHP TIDAK memuatkan php.ini dalam shell ini → jalankan artisan/pint dengan: `$php -d 'extension_dir=C:\laragon\bin\php\php-8.4.25-nts-Win32-vs17-x64\ext' -d extension=mbstring ...`, dan awalkan `$env:Path = 'C:\laragon\bin\git\cmd;' + $env:Path` supaya `pint --dirty` jumpa git. Semua fail M09 lulus `php -l` dan pint (EXIT=0).
+- `git` tiada pada PATH → `C:\laragon\bin\git\cmd\git.exe`.
+- PowerShell: petikan tunggal PHP dalam rentetan PS mesti digandakan (`''`) atau guna here-string `@'...'@`; elak `$this`/`$reasons` dalam rentetan berpetikan dua (interpolasi).
+- Anchor suntingan: normalise kandungan kepada LF dalam memori, buat gantian, tulis semula dengan EOL asal (fail repo bercampur CRLF/LF).
+- `run_commands` terhad ~12k aksara; pecahkan fail besar kepada beberapa cebisan (WriteAllText + AppendAllText).
 > **SESI AKAN DATANG:** **M10 Tiket Aduan Kerosakan telah SIAP** (lihat
 > `docs/superpowers/plans/2026-09-09-m10-tiket-aduan-plan.md`). Satu isu
 > sedia ada yang tidak berkaitan M10: `AuthenticationTest::test_account_is_locked_after_five_failed_attempts`

@@ -277,6 +277,18 @@ Kunci utama gabungan pada pengguna, peranan dan skop lokasi.
 | direkod_oleh | UUID | Ya | |
 | direkod_pada | Cap masa | Ya | |
 
+#### Pemetaan Pelaksanaan ASET dan SEJARAH_ASET (keputusan 9 September 2026)
+
+Pelaksanaan Laravel mengikut konvensyen aplikasi sedia ada (`locations`, `reference_values`): kunci utama integer berjujukan, bukan UUID; nama jadual dan lajur dalam Bahasa Inggeris snake_case; nilai enum dalam Bahasa Melayu.
+
+| Entiti DRD | Jadual pelaksanaan | Perbezaan utama daripada DRD |
+|---|---|---|
+| ASET | `assets` | `id` bigint; `no_pendaftaran` → `registration_number` varchar(50) unik tanpa penapis (DI-04); `kategori_id` → `category_id` FK ke `reference_values` (type `kategori_aset`); `no_siri` → `serial_number` unik nullable; `alamat_mac` → `mac_address`; `nama_hos` → `hostname`; lajur `ip_address` ditambah (FR-AST-04); `kod_qr` → `qr_code` token unik dijana semasa pendaftaran; `vendor_pembekal_id` ditangguhkan ke M12 |
+| SEJARAH_ASET | `asset_histories` | `id` bigint; FK `asset_id` dengan cascadeOnDelete; `nilai_sebelum`/`nilai_selepas` → `before`/`after` JSON; `direkod_pada` → `created_at` |
+| KATEGORI_ASET | `reference_values` (type `kategori_aset`) | Tiada jadual berdedikati; subkategori dan `jangka_hayat_tahun` disimpan dalam `metadata` JSON apabila M11 memerlukannya |
+
+Indeks bagi FR-AST-10: `registration_number`, `serial_number`, `location_id`, `status`, `category_id`, `responsible_user_id`.
+
 #### TIKET
 | Medan | Jenis | Wajib | Keterangan |
 |---|---|---|---|

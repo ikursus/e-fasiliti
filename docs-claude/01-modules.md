@@ -202,7 +202,7 @@ Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus ata
 | M06 Kelulusan | R sendiri | R | A | A | — | — | — | CRUD aliran |
 | M07 Daftar masuk | U sendiri | U bagi pihak | — | R | — | — | — | R |
 | M08 Sokongan | C sendiri | C | R | RU | R | — | — | R |
-| M09 Aset | R sendiri | R | — | R | RU | R | CRUD | CRUD |
+| M09 Aset | R sendiri | R | — | R | R | R | CRUD | CRUD |
 | M10 Tiket | CR sendiri | CR | R unit | R | RU ditugaskan | CRUA semua | R | CRUD |
 | M11 Penyelenggaraan | — | — | — | — | RU ditugaskan | CRUD | R | CRUD |
 | M12 Vendor | — | — | — | — | R | CRU | CRUD | CRUD |
@@ -211,6 +211,8 @@ Legenda: **C** cipta, **R** baca, **U** kemas kini, **D** padam, **A** lulus ata
 | M15 Laporan | R sendiri | R unit | R unit | R fasiliti | R sendiri | R semua ICT | R aset | R semua |
 | M16 Audit | — | — | — | — | — | R skop ICT | R skop aset | R semua |
 | M17 Pembantu AI | G | G | G | G | G | G | G | G + CRUD tetapan |
+
+> **Nota keputusan (9 September 2026):** Baris M09 asalnya memberi Juruteknik **RU**. Pemilik proses memutuskan pengurusan aset (cipta, kemas kini, padam) terhad kepada **Pegawai Aset** dan **Pentadbir Sistem** sahaja; Juruteknik kini **R** sahaja. Kakitangan kekal **R sendiri** — hanya aset yang didaftarkan atas namanya. Penyimpangan ini diwarisi oleh `RolesAndPermissionsSeeder` dan grid `EXPECTED_GRANTS` dalam `tests/Feature/Admin/PermissionSeedingTest.php`; jangan dibetulkan kembali ke RU tanpa keputusan baharu.
 
 ---
 
