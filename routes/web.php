@@ -167,6 +167,9 @@ Route::middleware('auth')->group(function (): void {
                 ->middleware('throttle:10,1')
                 ->name('photo.update');
 
+            Route::put('password', [ProfileController::class, 'updatePassword'])
+                ->middleware('throttle:6,1')
+                ->name('password.update');
         });
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Profile\ProfilePasswordRequest;
 use App\Http\Requests\Profile\ProfilePhotoRequest;
 use App\Http\Requests\Profile\ProfileUpdateRequest;
 use App\Models\AuditLog;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -78,6 +80,34 @@ class ProfileController extends Controller
 
         return to_route('profile.edit')
             ->with('status', 'Gambar profil telah dikemas kini.');
+    }
+
+    /**
+     * Change the authenticated user's own password. The current password is
+     * verified by ProfilePasswordRequest, then every other session of this
+     * user is terminated (the current session stays signed in).
+     */
+    public function updatePassword(ProfilePasswordRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // The "hashed" cast on the model hashes the plaintext automatically
+        // (NFR-S02) — the plain value is never stored.
+        $user->password = $request->input('password');
+        $user->save();
+
+        // Dev/prod use the database session driver: drop every other session
+        // of this user so other devices are logged out after the change.
+        DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->where('id', '!=', $request->session()->getId())
+            ->delete();
+
+        // Never record the password itself in the audit trail.
+        $this->audit('profile.password.updated', $request);
+
+        return to_route('profile.edit')
+            ->with('status', 'Kata laluan anda telah dikemas kini.');
     }
 
     /**
