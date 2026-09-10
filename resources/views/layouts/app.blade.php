@@ -157,9 +157,20 @@
                 @endcan
             </nav>
 
-            <div class="border-t border-slate-800 px-5 py-4">
-                <p class="text-xs text-slate-400">Daftar masuk</p>
-                <p class="truncate text-sm font-semibold text-white">{{ auth()->user()->name }}</p>
+            <div class="border-t border-slate-800 px-3 py-4">
+                <div class="px-2">
+                    <p class="text-xs text-slate-400">Daftar masuk</p>
+                    <p class="truncate text-sm font-semibold text-white">{{ auth()->user()->name }}</p>
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                    @csrf
+                    <button type="submit"
+                            @click="sidebarOpen = false"
+                            class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-rose-300 hover:bg-rose-500/10 hover:text-rose-200">
+                        Log Keluar
+                    </button>
+                </form>
             </div>
         </aside>
 
