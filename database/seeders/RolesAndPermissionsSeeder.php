@@ -45,6 +45,15 @@ class RolesAndPermissionsSeeder extends Seeder
         'tetapan.lihat',
         'tetapan.kemaskini',
 
+        // M10 — Tiket Aduan Kerosakan
+        'tiket.buka',
+        'tiket.lihat-sendiri',
+        'tiket.lihat-semua',
+        'tiket.kemas-kini',
+        'tiket.agih',
+        'tiket.keutamaan',
+        'tiket.tutup',
+
         // M15 — Laporan
         'laporan.lihat',
     ];
@@ -81,22 +90,35 @@ class RolesAndPermissionsSeeder extends Seeder
      * permission (routes/web.php), so granting pengguna.lihat today would
      * change nothing. Add it when those routes move to can: gating.
      *
+     * Note: the M10 row gives Pelulus "R unit", and Pentadbir Fasiliti and
+     * Pegawai Aset a plain read. Unit-scoped reads are not implemented yet,
+     * so those three roles receive tiket.lihat-semua instead. This is a
+     * deliberate widening, not an omission; revisit when scoping by unit
+     * arrives (UR-21 needs only the reporter's own list, which every role
+     * gets through tiket.lihat-sendiri regardless).
+     *
      * @var array<string, array<int, string>>
      */
     public const ROLE_PERMISSIONS = [
         'kakitangan' => [
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.buka',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'setiausaha' => [
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.buka',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'pelulus' => [
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.lihat-sendiri',
+            'tiket.lihat-semua',
             'unit-organisasi.lihat',
         ],
         'pentadbir-fasiliti' => [
@@ -105,11 +127,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'lokasi.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
+            'tiket.lihat-sendiri',
+            'tiket.lihat-semua',
             'unit-organisasi.lihat',
         ],
         'juruteknik' => [
             'laporan.lihat',
             'lokasi.lihat',
+            'tiket.kemas-kini',
+            'tiket.lihat-sendiri',
             'unit-organisasi.lihat',
         ],
         'penyelia-ict' => [
@@ -117,6 +143,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'audit.lihat',
             'tetapan.lihat',
             'lokasi.lihat',
+            'tiket.agih',
+            'tiket.buka',
+            'tiket.keutamaan',
+            'tiket.kemas-kini',
+            'tiket.lihat-sendiri',
+            'tiket.lihat-semua',
+            'tiket.tutup',
             'unit-organisasi.lihat',
         ],
         'pegawai-aset' => [
@@ -126,6 +159,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'lokasi.lihat',
             'lokasi.cipta',
             'lokasi.kemaskini',
+            'tiket.lihat-sendiri',
+            'tiket.lihat-semua',
             'unit-organisasi.lihat',
         ],
         'pentadbir-sistem' => self::PERMISSIONS,

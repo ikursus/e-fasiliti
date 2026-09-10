@@ -15,6 +15,10 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Ticket\MyTicketController;
+use App\Http\Controllers\Ticket\SupervisorTicketController;
+use App\Http\Controllers\Ticket\TechnicianTicketController;
+use App\Http\Controllers\Ticket\TicketAttachmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -66,6 +70,56 @@ Route::middleware('auth')->group(function (): void {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('password.confirm.store');
+
+    /**
+     * M10 — Tiket Aduan Kerosakan. Permissions follow the M10 row of the
+     * module/role matrix; the TicketPolicy layer enforces record-level
+     * ownership on top, so a permission alone never exposes another user's
+     * ticket (FR-USR-05, NFR-S11).
+     */
+    Route::prefix('tiket')->name('tiket.')->middleware('can:tiket.lihat-sendiri')->group(function (): void {
+        Route::get('saya', [MyTicketController::class, 'index'])->name('index');
+        Route::get('saya/cipta', [MyTicketController::class, 'create'])->name('create');
+
+        Route::post('saya', [MyTicketController::class, 'store'])
+            ->middleware('can:tiket.buka')
+            ->name('store');
+
+        Route::get('{ticket}', [MyTicketController::class, 'show'])->whereNumber('ticket')->name('show');
+        Route::post('{ticket}/sahkan', [MyTicketController::class, 'sahkan'])->name('sahkan');
+        Route::post('{ticket}/buka-semula', [MyTicketController::class, 'bukaSemula'])->name('buka-semula');
+        Route::get('{ticket}/lampiran/{indeks}', [TicketAttachmentController::class, 'muatTurun'])->name('lampiran');
+    });
+
+    Route::prefix('tiket')->name('tiket.')->middleware('can:tiket.kemas-kini')->group(function (): void {
+        Route::get('tugasan', [TechnicianTicketController::class, 'tugasan'])->name('tugasan');
+        Route::post('{ticket}/mula', [TechnicianTicketController::class, 'mula'])->name('mula');
+        Route::put('{ticket}/kerja', [TechnicianTicketController::class, 'simpanKerja'])->name('kerja');
+        Route::post('{ticket}/catatan', [TechnicianTicketController::class, 'catatan'])->name('catatan');
+        Route::post('{ticket}/rujuk-vendor', [TechnicianTicketController::class, 'rujukVendor'])->name('rujuk-vendor');
+        Route::post('{ticket}/sambung-vendor', [TechnicianTicketController::class, 'sambungVendor'])->name('sambung-vendor');
+        Route::post('{ticket}/selesai', [TechnicianTicketController::class, 'selesai'])->name('selesai');
+    });
+
+    Route::prefix('tiket')->name('tiket.')->middleware('can:tiket.lihat-semua')->group(function (): void {
+        Route::get('/', [SupervisorTicketController::class, 'index'])->name('senarai');
+
+        Route::post('agih-pukal', [SupervisorTicketController::class, 'agihPukal'])
+            ->middleware('can:tiket.agih')
+            ->name('agih-pukal');
+
+        Route::post('{ticket}/agih', [SupervisorTicketController::class, 'agih'])
+            ->middleware('can:tiket.agih')
+            ->name('agih');
+
+        Route::post('{ticket}/keutamaan', [SupervisorTicketController::class, 'keutamaan'])
+            ->middleware('can:tiket.keutamaan')
+            ->name('keutamaan');
+
+        Route::post('{ticket}/batal', [SupervisorTicketController::class, 'batal'])
+            ->middleware('can:tiket.agih')
+            ->name('batal');
+    });
 
     /**
      * Directory administration (M03). Shared by three roles, so access is

@@ -14,11 +14,10 @@ use Illuminate\Database\Seeder;
  * Default M01 configuration. Idempotent: existing rows are left alone so
  * running it again never overwrites an administrator's own values.
  *
- * Ticket priorities are deliberately not seeded. They are FR-ADM-05, a
- * phase 2 requirement belonging to the support ticket module, and the
- * TicketPriority model does not exist yet. The check-in settings below are
- * kept even though their tab is phase 3 work, because they are plain
- * scalar rows that cost nothing and save work when M07 arrives.
+ * Ticket SLA targets (FR-ADM-05) are seeded into the `sla` settings group,
+ * one row per priority and direction. The SlaCalculator falls back to the
+ * enum defaults when a row is missing, so a database that predates this
+ * seeder keeps working without a reseed.
  */
 class SystemConfigurationSeeder extends Seeder
 {
@@ -41,6 +40,14 @@ class SystemConfigurationSeeder extends Seeder
             ['key' => 'umum.bahasa_lalai', 'value' => '"ms"', 'value_type' => 'teks', 'group' => 'umum', 'description' => 'Bahasa lalai antara muka dan notifikasi.'],
             ['key' => 'checkin.threshold_minutes', 'value' => '15', 'value_type' => 'nombor', 'group' => 'daftar-masuk', 'description' => 'Ambang pengesahan kehadiran selepas waktu mula.'],
             ['key' => 'checkin.grace_minutes', 'value' => '15', 'value_type' => 'nombor', 'group' => 'daftar-masuk', 'description' => 'Tempoh anjal sebelum tempahan dilepaskan.'],
+            ['key' => 'sla.P1.tindak_balas_minit', 'value' => '30', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P1 Kritikal — sasaran tindak balas (minit bekerja).'],
+            ['key' => 'sla.P1.pemulihan_minit', 'value' => '240', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P1 Kritikal — sasaran pemulihan (minit bekerja).'],
+            ['key' => 'sla.P2.tindak_balas_minit', 'value' => '120', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P2 Tinggi — sasaran tindak balas (minit bekerja).'],
+            ['key' => 'sla.P2.pemulihan_minit', 'value' => '480', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P2 Tinggi — sasaran pemulihan (minit bekerja).'],
+            ['key' => 'sla.P3.tindak_balas_minit', 'value' => '240', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P3 Sederhana — sasaran tindak balas (minit bekerja).'],
+            ['key' => 'sla.P3.pemulihan_minit', 'value' => '1440', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P3 Sederhana — sasaran pemulihan (minit bekerja).'],
+            ['key' => 'sla.P4.tindak_balas_minit', 'value' => '480', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P4 Rendah — sasaran tindak balas (minit bekerja).'],
+            ['key' => 'sla.P4.pemulihan_minit', 'value' => '2400', 'value_type' => 'nombor', 'group' => 'sla', 'description' => 'P4 Rendah — sasaran pemulihan (minit bekerja).'],
         ];
 
         foreach ($settings as $setting) {
@@ -166,8 +173,32 @@ class SystemConfigurationSeeder extends Seeder
             [
                 'key' => 'tiket.dibuka',
                 'subject' => 'Tiket {{nombor_tiket}} telah dibuka',
-                'body' => "Salam {{nama_pelapor}},\n\nTiket {{nombor_tiket}} bagi aset {{nama_aset}} telah didaftarkan.",
-                'placeholders' => ['nama_pelapor', 'nombor_tiket', 'nama_aset'],
+                'body' => "Salam {{nama_pelapor}},\n\nAduan {{nombor_tiket}} telah diterima. Anggaran masa penyelesaian: {{anggaran_selesai}}.",
+                'placeholders' => ['nama_pelapor', 'nombor_tiket', 'kategori_masalah', 'anggaran_selesai', 'nama_aset'],
+            ],
+            [
+                'key' => 'tiket.diagih',
+                'subject' => 'Tiket {{nombor_tiket}} diagihkan kepada anda',
+                'body' => "Salam {{nama_juruteknik}},\n\nTiket {{nombor_tiket}} telah diagihkan kepada anda. Sila semak senarai tugasan anda.",
+                'placeholders' => ['nama_juruteknik', 'nombor_tiket'],
+            ],
+            [
+                'key' => 'tiket.selesai',
+                'subject' => 'Tiket {{nombor_tiket}} menunggu pengesahan anda',
+                'body' => "Salam {{nama_pelapor}},\n\nKerja pembaikan bagi tiket {{nombor_tiket}} telah ditanda selesai. Sila sahkan sama ada masalah benar-benar selesai.",
+                'placeholders' => ['nama_pelapor', 'nombor_tiket'],
+            ],
+            [
+                'key' => 'tiket.sla_amaran',
+                'subject' => 'Amaran SLA: {{nombor_tiket}}',
+                'body' => 'Tiket {{nombor_tiket}} telah melepasi 80% daripada sasaran pemulihan. Sila pantau status tiket.',
+                'placeholders' => ['nombor_tiket'],
+            ],
+            [
+                'key' => 'tiket.sla_langgar',
+                'subject' => 'SLA dilanggar: {{nombor_tiket}}',
+                'body' => 'Tiket {{nombor_tiket}} telah melanggar sasaran pemulihan. Tindakan segera diperlukan.',
+                'placeholders' => ['nombor_tiket'],
             ],
         ];
 
