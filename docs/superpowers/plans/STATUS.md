@@ -1,5 +1,12 @@
 # Status Pelaksanaan — kemas kini 9 September 2026
 
+> **SESI AKAN DATANG:** **M10 Tiket Aduan Kerosakan telah SIAP** (lihat
+> `docs/superpowers/plans/2026-09-09-m10-tiket-aduan-plan.md`). Satu isu
+> sedia ada yang tidak berkaitan M10: `AuthenticationTest::test_account_is_locked_after_five_failed_attempts`
+> gagal kerana `APP_LOCALE=en` dalam `.env` sedangkan ujian menjangka mesej
+> throttle BM. Modul domain A (M04 bilik / M05 tempahan) adalah calon kerja
+> seterusnya. Semua kerja di bawah ini ialah status M01/M03 yang lama.
+
 ## Di mana kita berhenti
 
 Melaksanakan pelan M03 secara dipandu subejen: satu subejen pelaksana bagi setiap tugasan, diikuti semakan pematuhan spesifikasi, kemudian semakan kualiti kod.
