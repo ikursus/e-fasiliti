@@ -90,7 +90,9 @@ Route::middleware('auth')->group(function (): void {
             Route::post('sessions/{chat_session}/messages', [ChatbotController::class, 'send'])
                 ->middleware('throttle:20,1')
                 ->name('messages.store');
-  /*
+        });
+
+    /**
      * Profile (self-service). Every user may only view and update their own
      * profile, so the routes do not bind a user model.
      */

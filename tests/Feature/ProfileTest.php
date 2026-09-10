@@ -64,6 +64,10 @@ class ProfileTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $user->id, 'email' => 'taken@example.com']);
     }
 
+    /**
+     * The payload deliberately carries is_active and password so the test can
+     * prove the endpoint drops them. Both values are fakes, never credentials.
+     */
     public function test_sensitive_attributes_cannot_be_changed_through_profile_update(): void
     {
         $user = User::factory()->create(['is_active' => true]);
@@ -74,7 +78,7 @@ class ProfileTest extends TestCase
                 'name' => $user->name,
                 'email' => $user->email,
                 'is_active' => false,
-                'password' => 'Pentadbir123!',
+                'password' => 'fake-value-the-endpoint-must-ignore',
             ])
             ->assertSessionHasNoErrors();
 
