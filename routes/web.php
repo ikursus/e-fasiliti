@@ -1,4 +1,5 @@
 <?php
+// Kursus Laravel
 
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\OrganizationUnitController;
