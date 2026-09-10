@@ -24,6 +24,7 @@ use Spatie\Permission\Traits\HasRoles;
     'delegate_end_at',
     'last_login_at',
     'last_login_ip',
+    'profile_photo_path',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -61,6 +62,21 @@ class User extends Authenticatable
             'delegate_end_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
+    }
+
+    /**
+     * URL of the profile photo, or an empty string when none is set. Built
+     * with asset() so it follows the host the app is actually served from
+     * (vhost, port or subdirectory), not APP_URL. The photo lives on the
+     * "public" disk at profile/{user_id}/{hash}.
+     */
+    public function profilePhotoUrl(): string
+    {
+        if ($this->profile_photo_path === null || $this->profile_photo_path === '') {
+            return '';
+        }
+
+        return asset('storage/'.$this->profile_photo_path);
     }
 
     /**
