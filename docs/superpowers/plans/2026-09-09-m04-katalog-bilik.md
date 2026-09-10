@@ -12,31 +12,34 @@
 
 ---
 
-## ⏸️ Status Pelaksanaan — 9 September 2026 (sesi 1 ditamatkan sini; sambung dari blok ini)
+## ✅ Status Pelaksanaan — SIAP pada 9 September 2026 (sesi 1 + 2)
 
-**Branch:** `feature/m04-katalog-bilik`. **Suite penuh: 232 lulus, 0 gagal** (garis dasar 217 + 1 kegagalan sedia ada dibaiki + ujian baharu Tasks 1–4).
+**Branch:** `feature/m04-katalog-bilik`. Komit: `836e1d4` (sesi 1) + `3ab5a34` (sesi 2). **Suite penuh: 256 lulus, 0 gagal** (garis dasar 217).
 
 | Task | Keadaan |
 |---|---|
-| 0 Pelan | ✅ Fail ini |
-| 1 Migrasi | ✅ 4 migrasi ditulis **dan dijalankan pada MySQL** (`php artisan migrate`) |
-| 2 Enum/model/factory | ✅ `BookingStatus`, `Room`, `RoomLayout`, `RoomFacility`, `Booking`, `Location::rooms()`, 3 factory + 7 ujian unit |
-| 3 Kebenaran | ✅ `bilik.*` dalam seeder + `EXPECTED_GRANTS` + ujian matriks. **Seeder BELUM dijalankan pada DB sebenar** — Task 11, dengan kebenaran pengguna |
-| 4 `referenceSummary()` | ✅ Baris `bilik` + ujian unit lokasi |
-| 5 Form Requests | ✅ `RoomStoreRequest` / `RoomUpdateRequest` lengkap (ujian khusus menyusul dalam Task 10) |
-| 6 Controller | ✅ `RoomController` index/create/store/edit/update/destroy + audit `room.*` — **views belum wujud** |
-| 7 Nyahaktif FR-BLK-08 | ◐ Logik `toggle()` siap; `resources/views/admin/rooms/deactivate.blade.php` **belum dicipta** |
-| 8 Views | ❌ Belum mula. Corak rujukan: `admin/locations/index.blade.php`, `_form.blade.php`; guna `<x-ui.location-picker>` |
-| 9 Laluan + sidebar | ❌ Import `RoomController` + laluan `admin.rooms.*` mesti dalam **satu suntingan** (hook Pint membuang import terasing) |
-| 10 Ujian ciri | ❌ 3 fail; benih `SystemConfigurationSeeder` diperlukan (kod rujukan benih: TEATER/KELAS/U, PROJEKTOR/PAPAN-PUTIH) |
-| 11 Checkpoint | ◐ Migrasi sudah; seeder + komit belum |
-| 12 Dokumen | ◇ STATUS.md + memory-bank dikemas kini pada penghentian sesi ini |
+| 0 Pelan | ✅ |
+| 1 Migrasi | ✅ dijalankan pada MySQL |
+| 2 Enum/model/factory | ✅ |
+| 3 Kebenaran `bilik.*` | ✅ kod + ujian. **Seeder TIDAK dijalankan — keputusan pengguna (9 Sep)** |
+| 4 `referenceSummary()` | ✅ |
+| 5 Form Requests | ✅ diuji dalam `RoomValidationTest` |
+| 6 Controller | ✅ diuji dalam `RoomManagementTest` |
+| 7 Nyahaktif FR-BLK-08 | ✅ `deactivate.blade.php` + `RoomDeactivationTest` (5 ujian) |
+| 8 Views | ✅ index/create/edit/_form (repeater susun atur Alpine, location-picker, waktu operasi 7 hari) |
+| 9 Laluan + sidebar | ✅ 7 laluan `admin.rooms.*` (`can:bilik.*`), kumpulan "Fasiliti" dalam sidebar |
+| 10 Ujian ciri | ✅ 24 ujian baharu (11+8+5) |
+| 11 Checkpoint | ✅ pint + suite + 2 komit. **`db:seed` ditunda atas keputusan pengguna** |
+| 12 Dokumen | ✅ STATUS.md + memory-bank |
+
+**Kesan seeder tidak dijalankan:** pelayar masih mempunyai peranan tanpa `bilik.*`, jadi `/admin/rooms` akan memberi **403 kepada semua** sehingga `php artisan db:seed --class=RolesAndPermissionsSeeder` dijalankan suatu hari nanti. Kod, ujian dan laluan lengkap dan selamat.
 
 **Pembetulan persekitaran yang direkodkan:**
 - Suite bermula dengan 1 kegagalan sedia ada (`AuthenticationTest` throttle) kerana `.env` kini `APP_LOCALE=en`. Dibaiki dengan `<env name="APP_LOCALE" value="ms"/>` dalam `phpunit.xml`. **Keputusan pengguna tertunggak:** sama ada `.env` mahu dikembalikan kepada `ms` (UI pelayar kini berbahasa Inggeris).
-- PHP/git tiada dalam PATH — guna `C:\laragonNafas\bin\php\php-8.4.25-Win32-vs17-x86\php.exe` dan `C:\laragonNafas\bin\git\cmd\git.exe`. Pint: `& $php vendor\laravel\pint\builds\pint --format agent`. Output PowerShell kerap gagal dirakam — alihkan ke fail (`*> storage\logs\diag.log`), baca semula, buang aksara `\0` (log UTF-16).
+- PHP/git tiada dalam PATH — `C:\laragonNafas\bin\php\php-8.4.25-Win32-vs17-x86\php.exe`, `C:\laragonNafas\bin\git\cmd\git.exe`. Pint: `& $php vendor\laravel\pint\builds\pint --format agent`. Output PowerShell kerap gagal dirakam — alihkan ke fail (`*> storage\logs\diag.log`), baca semula, buang aksara `\0` (log UTF-16).
+- Context `AuditRecorder` digabung pada **aras atas** `metadata` (bukan `metadata['context']`).
 
-**Langkah sambungan (susunan):** (1) `deactivate.blade.php` → (2) empat views Task 8 → (3) routes + sidebar Task 9 dalam satu suntingan → (4) tiga fail ujian Task 10 → (5) checkpoint pint+suite → komit `M04:` → (6) tanya kebenaran `db:seed --class=RolesAndPermissionsSeeder` → (7) buang blok ini daripada fail pelan.
+**Langkah seterusnya projek:** M06 Kelulusan (kitaran pelan dahulu), kemudian M05 Enjin Tempahan. Jalankan seeder kebenaran apabila pengguna sedia.
 
 ---
 

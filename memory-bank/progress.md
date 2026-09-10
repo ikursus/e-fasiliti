@@ -21,7 +21,7 @@
   - **Ujian: `tests/Feature/ProfileTest.php` — 10 lulus (35 assertions)**. Suite penuh: 232 lulus, 1 gagal (pre-existing — lihat Known issues).
   - `php artisan migrate` (kolum `profile_photo_path`) dan `php artisan storage:link` telah dijalankan pada DB dev.
 
-- **M04 — Katalog Bilik (dalam pembinaan, sesi 1 selesai)** — migrasi `rooms`/`room_layouts`/`room_facilities`/`bookings` dijalankan pada MySQL, `BookingStatus` + empat model + tiga factory, kebenaran `bilik.*` dalam kod seeder (**belum db:seed**), `Location::referenceSummary()` + alasan `bilik`, form requests bilik, `Admin\RoomController` dengan audit dan pengesahan FR-BLK-08. **232 ujian lulus.** Baki: views, routes/sidebar, ujian ciri, seeder — keadaan tepat dalam STATUS.md §M04.
+- **M04 — Katalog Bilik & Sumber (siap)** — CRUD bilik dengan susun atur (tepat satu lalai), kemudahan daripada senarai rujukan, peraturan khusus bilik (kelulusan, peranan dibenarkan, tempoh min/maks), waktu operasi khusus bilik melalui `operating_hours` polimorfik, nyahaktif dengan pengesahan tempahan terjejas (FR-BLK-08), padam disekat oleh tempahan, audit `room.*` penuh. Jadual `bookings` dicipta awal (skema sahaja) untuk M05. **Seeder kebenaran ditunda atas keputusan pengguna — `/admin/rooms` 403 sehingga dijalankan.** Ringkasan penuh: STATUS.md §M04.
 
 ## What's left to build
 - Modul domain (M04–M15): bilik, tempahan, kelulusan, daftar masuk, sokongan, aset, tiket, penyelenggaraan, vendor, stok, notifikasi, laporan.

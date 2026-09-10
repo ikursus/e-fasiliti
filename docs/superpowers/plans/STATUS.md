@@ -348,30 +348,28 @@ Semak dengan `php artisan migrate:status` dahulu jika ragu-ragu. Ia hanya membac
 
 ---
 
-## M04 Katalog Bilik — sesi 1 selesai 9 September 2026, sambung pada sesi seterusnya
+## M04 Katalog Bilik — SIAP pada 9 September 2026 (sesi 1 + 2)
 
-**Branch:** `feature/m04-katalog-bilik`. **Ujian: 232 lulus, 0 gagal** (garis dasar 217; +1 kegagalan sedia ada dibaiki; +14 ujian baharu Tasks 1–4).
+**Branch:** `feature/m04-katalog-bilik`. Komit: `836e1d4` + `3ab5a34`. **Ujian: 256 lulus, 0 gagal** (garis dasar 217; +1 kegagalan sedia ada dibaiki; +38 ujian baharu M04).
 
-**Sumber kebenaran keadaan tugasan:** blok "⏸️ Status Pelaksanaan" di bahagian atas `2026-09-09-m04-katalog-bilik.md` — ia menyenaraikan keadaan setiap Task dan langkah sambungan dalam susunan.
+**Sumber ringkasan penuh:** blok "✅ Status Pelaksanaan — SIAP" di bahagian atas `2026-09-09-m04-katalog-bilik.md`.
 
-### Yang telah siap (kod Tasks 1–7)
-- Migrasi `rooms`, `room_layouts`, `room_facilities`, `bookings` — **dijalankan pada MySQL** (`php artisan migrate`, aditif; tiada migrate:fresh).
-- `BookingStatus` (8 status DRD + `slotHolding()`), model `Room` / `RoomLayout` / `RoomFacility` / `Booking` (skop `upcoming`), `Location::rooms()`, tiga factory baharu.
-- Kebenaran `bilik.lihat/cipta/kemaskini/padam`: `RolesAndPermissionsSeeder` + baris `EXPECTED_GRANTS` + ujian `test_room_catalog_permissions_follow_the_matrix`. **Seeder belum dijalankan pada DB sebenar** — perlu kebenaran pengguna (Task 11).
-- `Location::referenceSummary()` menambah alasan `bilik` (FR-ORG-03) + ujian unit.
-- `RoomStoreRequest` / `RoomUpdateRequest`: kod unik tak peka huruf, lokasi mesti aras `ruang` dan aktif, min<maks, tepat satu susun atur lalai, kod daripada `reference_values` aktif, `days.*` tujuh hari pada kemas kini.
-- `Admin\RoomController` — CRUD + `toggle` dengan skrin pengesahan FR-BLK-08 + audit `room.created|updated|activated|deactivated|deleted`.
+### Apa yang dihantar
+- Migrasi `rooms`/`room_layouts`/`room_facilities`/`bookings` (dijalankan pada MySQL, aditif).
+- `BookingStatus`, model `Room`/`RoomLayout`/`RoomFacility`/`Booking`, `Location::rooms()`, 3 factory, `Location::referenceSummary()` + alasan `bilik`.
+- Kebenaran `bilik.lihat/cipta/kemaskini/padam` (kod seeder + `EXPECTED_GRANTS` + ujian matriks).
+- `RoomStoreRequest`/`RoomUpdateRequest`; `Admin\RoomController` (CRUD + toggle FR-BLK-08 + audit `room.*`).
+- 5 views `admin/rooms/*` (repeater susun atur Alpine, `<x-ui.location-picker>`, waktu operasi 7 hari, skrin pengesahan nyahaktif).
+- 7 laluan `admin.rooms.*` dengan `can:bilik.*`; sidebar kumpulan "Fasiliti"; placeholder "Tempahan Bilik Mesyuarat" ditukar kepada "Enjin Tempahan & Kalendar".
+- 38 ujian baharu: unit (7), `RoomManagementTest` (11), `RoomValidationTest` (8), `RoomDeactivationTest` (5), matriks kebenaran (1) dan lain-lain.
 
-### Pembetulan persekitaran yang berlaku dalam sesi ini
-- **`.env` telah berubah kepada `APP_LOCALE=en`** (memori mencatat `ms`), menyebabkan `AuthenticationTest::test_account_is_locked_after_five_failed_attempts` gagal secara konsisten. Dibaiki dengan `<env name="APP_LOCALE" value="ms"/>` dalam `phpunit.xml`. **Keputusan tertunggak pengguna:** sama ada `.env` mahu dikembalikan kepada `ms`.
-- **Catatan "bukan repositori git" tidak lagi tepat** — repo git wujud (2 komit di `main` sebelum M04) dan binary berada di `C:\laragonNafas\bin\git\cmd\git.exe`. PHP 8.4 di `C:\laragonNafas\bin\php\php-8.4.25-Win32-vs17-x86\php.exe`. Kedua-duanya tiada dalam PATH.
-- Pint: `& $php vendor\laravel\pint\builds\pint --format agent`. Rakaman output PowerShell kerap gagal: alihkan `*> storage\logs\diag.log`, baca fail, buang aksara `\0` (UTF-16).
+### Keputusan dan isu yang dibawa ke hadapan
+1. **Seeder kebenaran TIDAK dijalankan** — keputusan pengguna (9 Sep). `/admin/rooms` akan 403 kepada semua peranan di pelayar sehingga `php artisan db:seed --class=RolesAndPermissionsSeeder` dijalankan. Kod/ujian/laluan lengkap.
+2. **`.env` masih `APP_LOCALE=en`** (dulu `ms`). Ujian dikunci `ms` melalui phpunit.xml. UI pelayar kini berbahasa Inggeris — pengguna perlu putuskan.
+3. **Catatan "bukan repositori git" tamat tempoh** — repo git wujud; binary di `C:\laragonNafas\bin\git\cmd\git.exe`; PHP 8.4 di `C:\laragonNafas\bin\php\php-8.4.25-Win32-vs17-x86\php.exe`; kedua-duanya tiada dalam PATH. Pint: `vendor\laravel\pint\builds\pint`.
+4. Context `AuditRecorder` digabung pada **aras atas** `metadata` — bukan `metadata['context']`.
 
-### Seterusnya (susunan pelaksanaan)
-1. Task 7 view: `resources/views/admin/rooms/deactivate.blade.php` (senarai tempahan terjejas + butang sah).
-2. Task 8 views: `admin/rooms/index|create|edit|_form` — corak `admin/locations/*`, `<x-ui.location-picker>`, repeater susun atur Alpine, checkbox kemudahan (benih: TEATER/KELAS/U, PROJEKTOR/PAPAN-PUTIH), jadual waktu operasi 7 hari (corak `admin/settings/operating-hours`).
-3. Task 9: import `RoomController` + laluan `admin.rooms.*` (`can:bilik.*`) dalam **satu suntingan** `routes/web.php`; pautan sidebar kumpulan "Fasiliti".
-4. Task 10: `RoomManagementTest`, `RoomValidationTest`, `RoomDeactivationTest` — seed `SystemConfigurationSeeder` untuk kod rujukan.
-5. Task 11: checkpoint `pint` → `php artisan test` → komit `M04:` → **tanya pengguna** sebelum `db:seed --class=RolesAndPermissionsSeeder`.
-6. Task 12: kemas kini memory-bank selepas M04 selesai.
+### Seterusnya
+1. Bila pengguna sedia: jalankan `db:seed --class=RolesAndPermissionsSeeder` (syncPermissions membuang ubah suai manual).
+2. M06 Kelulusan — kitaran spec dan pelan dahulu (susunan dipersetujui: M04 → M06 → M05 → M14 e-mel).
 
